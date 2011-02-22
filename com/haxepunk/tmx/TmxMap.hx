@@ -19,10 +19,10 @@ class TmxMap
 	public var tileSets:Hash<TmxTileSet>;
 	public var objectGroups:Hash<TmxObjectGroup>;
 	
-	public function TmxMap(data:Dynamic)
+	public function new(data:Dynamic)
 	{
 		properties = null;
-		var source:Xml;
+		var source:Xml = null;
 		
 		if (Std.is(data, String)) source = Xml.parse(data);
 		else if (Std.is(data, Xml)) source = data;
@@ -30,6 +30,8 @@ class TmxMap
 		layers = new Hash<TmxLayer>();
 		tileSets = new Hash<TmxTileSet>();
 		objectGroups = new Hash<TmxObjectGroup>();
+		
+		source = source.firstElement(); // <map>
 		
 		//map header
 		version = (source.get("version") != null) ? source.get("version") : "unknown"; 
@@ -75,17 +77,14 @@ class TmxMap
 	public function setProperty(name:String, value:String)
 	{
 		if (properties == null) return;
-		properties[name] = value;
+		Reflect.setField(properties, name, value);
 	}
 	
 	public function checkProperty(name:String):String
 	{
 		if (properties == null) return null;
 		
-		if (properties[name])
-			return properties[name];
-		
-		return null;
+		return Reflect.field(properties, name);
 	}
 	
 	//works only after TmxTileSet has been initialized with an image...

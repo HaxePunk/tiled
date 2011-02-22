@@ -19,7 +19,7 @@ class TmxPropertySet
 		{
 			var key:String = prop.get("name");
 			var value:String = prop.get("value");
-			this[key] = value;
+			Reflect.setField(this, key, value);
 		}
 		return this;
 	}

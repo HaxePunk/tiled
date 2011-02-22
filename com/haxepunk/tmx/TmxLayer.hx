@@ -19,13 +19,15 @@ class TmxLayer
 	public var height:Int;
 	public var opacity:Float;
 	public var visible:Bool;
-	public var tileGIDs:Array<Int>;
+	public var tileGIDs:Array<Array<Int>>;
 	public var properties:TmxPropertySet;
 	
 	public function new(source:Xml, parent:TmxMap)
 	{
+		var node:Xml;
 		properties = null;
 		map = parent;
+		
 		name = source.get("name");
 		x = Std.parseInt(source.get("x"));
 		y = Std.parseInt(source.get("y")); 
@@ -35,53 +37,46 @@ class TmxLayer
 		opacity = Std.parseFloat(source.get("opacity"));
 		
 		//load properties
-		var node:Xml;
 		for (node in source.elementsNamed("properties"))
 			properties = (properties != null) ? properties.extend(node) : new TmxPropertySet(node);
 		
 		//load tile GIDs
-		tileGIDs = [];
-		var data:Xml = source.data[0];
-		if(data)
+		tileGIDs = new Array<Array<Int>>();
+		for (node in source.elementsNamed("data"))
 		{
-			var chunk:String = "";
-			if(data.get("encoding").length() == 0)
+			var chunk:String = node.toString();
+			switch(node.get("encoding"))
 			{
-				//create a 2dimensional array
-				var lineWidth:Int = width;
-				var rowIdx:Int = -1;
-				for (node in data.tile)
-				{
-					//new line?
-					if(++lineWidth >= width)
+				case "csv":
+					tileGIDs = csvToArray(chunk, width);
+				case "base64":
+					var compressed:Bool = false;
+					var time:Float = Lib.getTimer();
+					switch(node.get("compression"))
 					{
-						tileGIDs[++rowIdx] = [];
-						lineWidth = 0;
+						case "zlib":
+							compressed = true;
+						default:
+							throw "TmxLayer - data compression type not supported!";
 					}
-					var gid:Int = node.get("gid");
-					tileGIDs[rowIdx].push(gid);
-				}
-			}
-			else if(data.get("encoding") == "csv")
-			{
-				chunk = data;
-//					trace(chunk);
-				tileGIDs = csvToArray(chunk, width);
-			}
-			else if(data.get("encoding") == "base64")
-			{
-				chunk = data;
-				var compressed:Boolean = false;
-//					trace(chunk);
-				var time:Float = getTimer();
-				if(data.get("compression") == "zlib")
-					compressed = true;
-				else if(data.get("compression").length() != 0)
-					throw "TmxLayer - data compression type not supported!";
-				
-				var i:Int;
-				for (i in 0...100)
-					tileGIDs = base64ToArray(chunk, width, compressed);	
+					var i:Int;
+					for (i in 0...100)
+						tileGIDs = base64ToArray(chunk, width, compressed);	
+				default:
+					//create a 2dimensional array
+					var lineWidth:Int = width;
+					var rowIdx:Int = -1;
+					for (node in node.elementsNamed("tile"))
+					{
+						//new line?
+						if(++lineWidth >= width)
+						{
+							tileGIDs[++rowIdx] = [];
+							lineWidth = 0;
+						}
+						var gid:Int = Std.parseInt(node.get("gid"));
+						tileGIDs[rowIdx].push(gid);
+					}
 			}
 		}
 	}
@@ -132,33 +127,33 @@ class TmxLayer
 	}
 	*/
 	
-	private static function csvToArray(input:String, lineWidth:Int):Array<String>
+	private static function csvToArray(input:String, lineWidth:Int):Array<Array<Int>>
 	{
-		var result:Array<String> = new Array<String>();
+		var result:Array<Array<Int>> = new Array<Array<Int>>();
 		var rows:Array<String> = input.split("\n");
 		var row:String;
 		for (row in rows)
 		{
-			var resultRow:Array = [];
-			var entries:Array = row.split(",", lineWidth);
+			var resultRow:Array<Int> = new Array<Int>();
+			var entries:Array<String> = row.split(",");
 			var entry:String;
 			for (entry in entries)
-				resultRow.push(uint(entry)); //convert to uint
+				resultRow.push(Std.parseInt(entry)); //convert to uint
 			result.push(resultRow);
 		}
 		return result;
 	}
 	
-	private static function base64ToArray(chunk:String, lineWidth:Int, compressed:Bool):Array<Int>
+	private static function base64ToArray(chunk:String, lineWidth:Int, compressed:Bool):Array<Array<Int>>
 	{
-		var result:Array<Int> = new Array<Int>();
+		var result:Array<Array<Int>> = new Array<Array<Int>>();
 		var data:ByteArray = base64ToByteArray(chunk);
 		if(compressed)
 			data.uncompress();
 		data.endian = Endian.LITTLE_ENDIAN;
 		while(data.position < data.length)
 		{
-			var resultRow:Array = [];
+			var resultRow:Array<Int> = new Array<Int>();
 			var i:Int;
 			for (i in 0...lineWidth)
 				resultRow.push(data.readInt());
@@ -173,14 +168,12 @@ class TmxLayer
 	{
 		var output:ByteArray = new ByteArray();
 		//initialize lookup table
-		var lookup:Array = [];
+		var lookup:Array<Int> = new Array<Int>();
 		var c:Int;
 		for (c in 0...BASE64_CHARS.length)
 			lookup[BASE64_CHARS.charCodeAt(c)] = c;
-
-		var outputBuffer:Array = new Array(3);
 		
-		var i:UInt = 0;
+		var i:Int = 0;
 		while (i < data.length - 3) 
 		{
 			//read 4 bytes and look them up in the table

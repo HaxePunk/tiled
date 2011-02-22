@@ -10,7 +10,7 @@ import flash.geom.Rectangle;
 
 class TmxTileSet
 {
-	private var _tileProps:Array<Int>;
+	private var _tileProps:Array<TmxPropertySet>;
 	private var _image:BitmapData;
 	
 	public var firstGID:Int;
@@ -32,22 +32,24 @@ class TmxTileSet
 		numTiles = 0xFFFFFF;
 		numRows = numCols = 1;
 		
-		firstGID = source.get("firstgid");
+		firstGID = Std.parseInt(source.get("firstgid"));
 
-		imageSource = source.image.get("source");
+		var image:Xml;
+		for (image in source.elementsNamed("image"))
+			imageSource = image.get("source");
 		
 		map = parent;
 		name = source.get("name");
-		tileWidth = source.get("tilewidth");
-		tileHeight = source.get("tileheight");
-		spacing = source.get("spacing");
-		margin = source.get("margin");
+		tileWidth = Std.parseInt(source.get("tilewidth"));
+		tileHeight = Std.parseInt(source.get("tileheight"));
+		spacing = Std.parseInt(source.get("spacing"));
+		margin = Std.parseInt(source.get("margin"));
 			
 		//read properties
 		var node:Xml;
-		for (node in source.tile)
-			if(node.properties[0])
-				_tileProps[ode.get("id")] = new TmxPropertySet(node.properties[0]);
+		for (node in source.elementsNamed("tile"))
+			if(node.elementsNamed("properties") != null)
+				_tileProps[Std.parseInt(node.get("id"))] = new TmxPropertySet(node);
 	}
 	
 	public var image(getImage, setImage):BitmapData;

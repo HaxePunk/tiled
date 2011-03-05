@@ -4,6 +4,7 @@
  * For questions mail me at heardtheword@gmail.com
  ******************************************************************************/
 package com.haxepunk.tmx;
+import haxe.xml.Fast;
 
 class TmxObjectGroup
 {
@@ -18,26 +19,27 @@ class TmxObjectGroup
 	public var properties:TmxPropertySet;
 	public var objects:Array<TmxObject>;
 	
-	public function new(source:Xml, parent:TmxMap)
+	public function new(source:Fast, parent:TmxMap)
 	{
+		properties = new TmxPropertySet();
 		objects = new Array<TmxObject>();
 		
 		map = parent;
-		name = source.get("name");
-		x = Std.parseInt(source.get("x"));
-		y = Std.parseInt(source.get("y"));
-		width = Std.parseInt(source.get("width"));
-		height = Std.parseInt(source.get("height"));
-		visible = source.get("visible") == "1" ? true : false;
-		opacity = Std.parseFloat(source.get("opacity"));
+		name = source.att.name;
+		x = (source.has.x) ? Std.parseInt(source.att.x) : 0;
+		y = (source.has.y) ? Std.parseInt(source.att.y) : 0;
+		width = Std.parseInt(source.att.width);
+		height = Std.parseInt(source.att.height);
+		visible = (source.has.visible && source.att.visible == "1") ? true : false;
+		opacity = (source.has.opacity) ? Std.parseFloat(source.att.opacity) : 0;
 		
 		//load properties
-		var node:Xml;
-		for (node in source.elementsNamed("properties"))
-			properties = (properties != null) ? properties.extend(node) : new TmxPropertySet(node);
+		var node:Fast;
+		for (node in source.nodes.properties)
+			properties.extend(node);
 			
 		//load objects
-		for (node in source.elementsNamed("objects"))
+		for (node in source.nodes.object)
 			objects.push(new TmxObject(node, this));
 	}
 }

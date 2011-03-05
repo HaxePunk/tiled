@@ -4,6 +4,7 @@
  * For questions mail me at heardtheword@gmail.com
  ******************************************************************************/
 package com.haxepunk.tmx;
+import haxe.xml.Fast;
 
 class TmxObject
 {
@@ -18,21 +19,21 @@ class TmxObject
 	public var custom:TmxPropertySet;
 	public var shared:TmxPropertySet;
 	
-	public function new(source:Xml, parent:TmxObjectGroup)
+	public function new(source:Fast, parent:TmxObjectGroup)
 	{
 		group = parent;
-		name = source.get("name");
-		type = source.get("type");
-		x = Std.parseInt(source.get("x"));
-		y = Std.parseInt(source.get("y"));
-		width = Std.parseInt(source.get("width"));
-		height = Std.parseInt(source.get("height"));
+		name = source.att.name;
+		type = source.att.type;
+		x = Std.parseInt(source.att.x);
+		y = Std.parseInt(source.att.y);
+		width = Std.parseInt(source.att.width);
+		height = Std.parseInt(source.att.height);
 		//resolve inheritence
 		shared = null;
 		gid = -1;
-		if(source.get("gid").length != 0) //object with tile association?
+		if(source.has.gid && source.att.gid.length != 0) //object with tile association?
 		{
-			gid = Std.parseInt(source.get("gid"));
+			gid = Std.parseInt(source.att.gid);
 			var tileSet:TmxTileSet;
 			for (tileSet in group.map.tileSets)
 			{
@@ -44,7 +45,8 @@ class TmxObject
 		
 		//load properties
 		var node:Xml;
-		for (node in source.elementsNamed("properties"))
-			custom = (custom != null) ? custom.extend(node) : new TmxPropertySet(node);
+		custom = new TmxPropertySet();
+		for (node in source.nodes.properties)
+			custom.extend(node);
 	}
 }

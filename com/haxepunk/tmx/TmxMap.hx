@@ -5,56 +5,65 @@
  ******************************************************************************/
 package com.haxepunk.tmx;
 
+import haxe.xml.Fast;
+
 class TmxMap
 {
 	public var version:String; 
 	public var orientation:String;
-	public var width:UInt;
-	public var height:UInt; 
-	public var tileWidth:UInt; 
-	public var tileHeight:UInt;
+	public var width:Int;
+	public var height:Int; 
+	public var tileWidth:Int; 
+	public var tileHeight:Int;
 	
-	public var properties:TmxPropertySet;
+	public var properties(default, null):TmxPropertySet;
 	public var layers:Hash<TmxLayer>;
 	public var tileSets:Hash<TmxTileSet>;
 	public var objectGroups:Hash<TmxObjectGroup>;
 	
-	public function TmxMap(data:Dynamic)
+	public function new(data:Dynamic)
 	{
-		properties = null;
-		var source:Xml;
+		properties = new TmxPropertySet();
+		var source:Fast = null;
+		var node:Fast = null;
 		
-		if (Std.is(data, String)) source = Xml.parse(data);
-		else if (Std.is(data, Xml)) source = data;
+		if (Std.is(data, String)) source = new Fast(Xml.parse(data));
+		else if (Std.is(data, Xml)) source = new Fast(data);
+		else throw "Unknown TMX map format";
 		
 		layers = new Hash<TmxLayer>();
 		tileSets = new Hash<TmxTileSet>();
 		objectGroups = new Hash<TmxObjectGroup>();
 		
+		source = source.node.map;
+		
 		//map header
-		version = (source.get("version") != null) ? source.get("version") : "unknown"; 
-		orientation = (source.get("orientation") != null) ? source.get("orientation") : "orthogonal";
-		width = Std.parseInt(source.get("width"));
-		height = Std.parseInt(source.get("height"));
-		tileWidth = Std.parseInt(source.get("tilewidth"));
-		tileHeight= Std.parseInt(source.get("tileheight"));
+		version = source.att.version;
+		if (version == null) version = "unknown";
+		
+		orientation = source.att.orientation;
+		if (orientation == null) orientation = "orthogonal";
+		
+		width = Std.parseInt(source.att.width);
+		height = Std.parseInt(source.att.height);
+		tileWidth = Std.parseInt(source.att.tilewidth);
+		tileHeight= Std.parseInt(source.att.tileheight);
 		
 		//read properties
-		for (node in source.elementsNamed("properties"))
-			properties = (properties != null) ? properties.extend(node) : new TmxPropertySet(node);
+		for (node in source.nodes.properties)
+			properties.extend(node);
 		
 		//load tilesets
-		var node:Xml = null;
-		for (node in source.elementsNamed("tileset"))
-			tileSets.set(node.get("name"), new TmxTileSet(node, this));
+		for (node in source.nodes.tileset)
+			tileSets.set(node.att.name, new TmxTileSet(node, this));
 		
 		//load layer
-		for (node in source.elementsNamed("layer"))
-			layers.set(node.get("name"), new TmxLayer(node, this));
+		for (node in source.nodes.layer)
+			layers.set(node.att.name, new TmxLayer(node, this));
 		
 		//load object group
-		for (node in source.elementsNamed("objectgroup"))
-			objectGroups.set(node.get("name"), new TmxObjectGroup(node, this));
+		for (node in source.nodes.objectgroup)
+			objectGroups.set(node.att.name, new TmxObjectGroup(node, this));
 	}
 	
 	public function getTileSet(name:String):TmxTileSet
@@ -70,22 +79,6 @@ class TmxMap
 	public function getObjectGroup(name:String):TmxObjectGroup
 	{
 		return objectGroups.get(name);
-	}
-	
-	public function setProperty(name:String, value:String)
-	{
-		if (properties == null) return;
-		properties[name] = value;
-	}
-	
-	public function checkProperty(name:String):String
-	{
-		if (properties == null) return null;
-		
-		if (properties[name])
-			return properties[name];
-		
-		return null;
 	}
 	
 	//works only after TmxTileSet has been initialized with an image...

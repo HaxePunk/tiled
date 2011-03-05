@@ -7,6 +7,7 @@ package com.haxepunk.tmx;
 
 import flash.display.BitmapData;
 import flash.geom.Rectangle;
+import haxe.xml.Fast;
 
 class TmxTileSet
 {
@@ -27,27 +28,27 @@ class TmxTileSet
 	public var numRows:Int;
 	public var numCols:Int;
 	
-	public function new(source:Xml, parent:TmxMap)
+	public function new(source:Fast, parent:TmxMap)
 	{
+		var node:Fast;
 		numTiles = 0xFFFFFF;
 		numRows = numCols = 1;
 		
-		firstGID = source.get("firstgid");
+		firstGID = Std.parseInt(source.att.firstgid);
 
-		imageSource = source.image.get("source");
+		var node:Fast = source.node.image;
+		imageSource = node.att.source;
 		
 		map = parent;
-		name = source.get("name");
-		tileWidth = source.get("tilewidth");
-		tileHeight = source.get("tileheight");
-		spacing = source.get("spacing");
-		margin = source.get("margin");
-			
+		name = source.att.name;
+		if (source.has.tilewidth) tileWidth = Std.parseInt(source.att.tilewidth);
+		if (source.has.tileheight) tileHeight = Std.parseInt(source.att.tileheight);
+		if (source.has.spacing) spacing = Std.parseInt(source.att.spacing);
+		if (source.has.margin) margin = Std.parseInt(source.att.margin);
+		
 		//read properties
-		var node:Xml;
-		for (node in source.tile)
-			if(node.properties[0])
-				_tileProps[ode.get("id")] = new TmxPropertySet(node.properties[0]);
+		//for (node in source.elementsNamed("tile"))
+		//	_tileProps[ode.get("id")] = new TmxPropertySet(node.properties[0]);
 	}
 	
 	public var image(getImage, setImage):BitmapData;
@@ -82,12 +83,12 @@ class TmxTileSet
 
 	public function getPropertiesByGid(gid:Int):TmxPropertySet
 	{
-		return _tileProps[gid - firstGID];	
+		return null; // _tileProps[gid - firstGID];
 	}
 	
 	public function getProperties(id:Int):TmxPropertySet
 	{
-		return _tileProps[id];	
+		return null; // _tileProps[id];
 	}
 	
 	public function getRect(id:Int):Rectangle

@@ -5,22 +5,29 @@
  ******************************************************************************/
 package com.haxepunk.tmx;
 
-class TmxPropertySet
+import haxe.xml.Fast;
+
+class TmxPropertySet implements Dynamic<String>
 {
-	public function new(source:Xml)
+	
+	public function new()
 	{
-		extend(source);
+		keys = new Hash<String>();
 	}
 	
-	public function extend(source:Xml):TmxPropertySet
+	public function resolve(name:String):String
 	{
-		var prop:Xml;
-		for (prop in source.elementsNamed("property"))
-		{
-			var key:String = prop.get("name");
-			var value:String = prop.get("value");
-			this[key] = value;
-		}
-		return this;
+		return keys.get(name);
 	}
+	
+	public function extend(source:Fast)
+	{
+		var prop:Fast;
+		for (prop in source.nodes.property)
+		{
+			keys.set(prop.att.name, prop.att.value);
+		}
+	}
+	
+	private var keys:Hash<String>;
 }

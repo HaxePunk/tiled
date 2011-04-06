@@ -11,10 +11,13 @@ class TmxMap
 {
 	public var version:String; 
 	public var orientation:String;
+	
 	public var width:Int;
 	public var height:Int; 
 	public var tileWidth:Int; 
 	public var tileHeight:Int;
+	public var fullWidth:Int;
+	public var fullHeight:Int;
 	
 	public var properties(default, null):TmxPropertySet;
 	public var layers:Hash<TmxLayer>;
@@ -47,7 +50,10 @@ class TmxMap
 		width = Std.parseInt(source.att.width);
 		height = Std.parseInt(source.att.height);
 		tileWidth = Std.parseInt(source.att.tilewidth);
-		tileHeight= Std.parseInt(source.att.tileheight);
+		tileHeight = Std.parseInt(source.att.tileheight);
+		// Calculate the entire size
+		fullWidth = width * tileWidth;
+		fullHeight = height * tileHeight;
 		
 		//read properties
 		for (node in source.nodes.properties)

@@ -6,6 +6,7 @@
 package com.haxepunk.tmx;
 
 import haxe.xml.Fast;
+import flash.utils.ByteArray;
 
 class TmxMap
 {
@@ -20,8 +21,8 @@ class TmxMap
 	public var fullHeight:Int;
 	
 	public var properties(default, null):TmxPropertySet;
+	public var tilesets:Array<TmxTileSet>;
 	public var layers:Hash<TmxLayer>;
-	public var tileSets:Hash<TmxTileSet>;
 	public var objectGroups:Hash<TmxObjectGroup>;
 	
 	public function new(data:Dynamic)
@@ -32,10 +33,11 @@ class TmxMap
 		
 		if (Std.is(data, String)) source = new Fast(Xml.parse(data));
 		else if (Std.is(data, Xml)) source = new Fast(data);
+		else if (Std.is(data, ByteArray)) source = new Fast(Xml.parse(data.toString()));
 		else throw "Unknown TMX map format";
 		
+		tilesets = new Array<TmxTileSet>();
 		layers = new Hash<TmxLayer>();
-		tileSets = new Hash<TmxTileSet>();
 		objectGroups = new Hash<TmxObjectGroup>();
 		
 		source = source.node.map;
@@ -61,7 +63,7 @@ class TmxMap
 		
 		//load tilesets
 		for (node in source.nodes.tileset)
-			tileSets.set(node.att.name, new TmxTileSet(node, this));
+			tilesets.push(new TmxTileSet(node));
 		
 		//load layer
 		for (node in source.nodes.layer)
@@ -70,11 +72,6 @@ class TmxMap
 		//load object group
 		for (node in source.nodes.objectgroup)
 			objectGroups.set(node.att.name, new TmxObjectGroup(node, this));
-	}
-	
-	public function getTileSet(name:String):TmxTileSet
-	{
-		return tileSets.get(name);
 	}
 	
 	public function getLayer(name:String):TmxLayer
@@ -91,11 +88,11 @@ class TmxMap
 	public function getGidOwner(gid:Int):TmxTileSet
 	{
 		var last:TmxTileSet = null;
-		var tileSet:TmxTileSet;
-		for (tileSet in tileSets)
+		var set:TmxTileSet;
+		for (set in tilesets)
 		{
-			if(tileSet.hasGid(gid))
-				return tileSet;
+			if(set.hasGid(gid))
+				return set;
 		}
 		return null;
 	}

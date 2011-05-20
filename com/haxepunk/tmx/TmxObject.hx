@@ -22,22 +22,22 @@ class TmxObject
 	public function new(source:Fast, parent:TmxObjectGroup)
 	{
 		group = parent;
-		name = source.att.name;
-		type = source.att.type;
+		name = (source.has.name) ? source.att.name : "[object]";
+		type = (source.has.type) ? source.att.type : "";
 		x = Std.parseInt(source.att.x);
 		y = Std.parseInt(source.att.y);
-		width = Std.parseInt(source.att.width);
-		height = Std.parseInt(source.att.height);
+		width = (source.has.width) ? Std.parseInt(source.att.width) : 0;
+		height = (source.has.height) ? Std.parseInt(source.att.height) : 0;
 		//resolve inheritence
 		shared = null;
 		gid = -1;
 		if(source.has.gid && source.att.gid.length != 0) //object with tile association?
 		{
 			gid = Std.parseInt(source.att.gid);
-			var tileSet:TmxTileSet;
-			for (tileSet in group.map.tileSets)
+			var set:TmxTileSet;
+			for (set in group.map.tilesets)
 			{
-				shared = tileSet.getPropertiesByGid(gid);
+				shared = set.getPropertiesByGid(gid);
 				if(shared != null)
 					break;
 			}

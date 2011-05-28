@@ -7,11 +7,12 @@ package com.haxepunk.tmx;
 
 import flash.display.BitmapData;
 import flash.geom.Rectangle;
+import flash.utils.ByteArray;
 import haxe.xml.Fast;
 
 class TmxTileSet
 {
-	private var _tileProps:Array<Int>;
+	private var _tileProps:Array<TmxPropertySet>;
 	private var _image:BitmapData;
 	
 	public var firstGID:Int;
@@ -27,13 +28,25 @@ class TmxTileSet
 	public var numRows:Int;
 	public var numCols:Int;
 	
-	public function new(source:Fast)
+	public function new(data:Dynamic)
 	{
-		var node:Fast;
+		var node:Fast, source:Fast;
 		numTiles = 0xFFFFFF;
 		numRows = numCols = 1;
 		
-		firstGID = Std.parseInt(source.att.firstgid);
+		// Use the correct data format
+		if (Std.is(data, Fast))
+		{
+			source = data;
+		}
+		else if (Std.is(data, ByteArray))
+		{
+			source = new Fast(Xml.parse(data.toString()));
+			source = source.node.tileset;
+		}
+		else throw "Unknown TMX tileset format";
+		
+		firstGID = (source.has.firstgid) ? Std.parseInt(source.att.firstgid) : 1;
 		
 		// check for external source
 		if (source.has.source)
@@ -52,8 +65,14 @@ class TmxTileSet
 			if (source.has.margin) margin = Std.parseInt(source.att.margin);
 			
 			//read properties
-			//for (node in source.elementsNamed("tile"))
-			//	_tileProps[ode.get("id")] = new TmxPropertySet(node.properties[0]);
+			_tileProps = new Array<TmxPropertySet>();
+			for (node in source.nodes.tile)
+			{
+				var id:Int = (node.has.id) ? Std.parseInt(node.att.id) : continue;
+				_tileProps[id] = new TmxPropertySet();
+				for (prop in node.nodes.properties)
+					_tileProps[id].extend(prop);
+			}
 		}
 	}
 	
@@ -89,12 +108,12 @@ class TmxTileSet
 
 	public function getPropertiesByGid(gid:Int):TmxPropertySet
 	{
-		return null; // _tileProps[gid - firstGID];
+		return _tileProps[gid - firstGID];
 	}
 	
 	public function getProperties(id:Int):TmxPropertySet
 	{
-		return null; // _tileProps[id];
+		return _tileProps[id];
 	}
 	
 	public function getRect(id:Int):Rectangle

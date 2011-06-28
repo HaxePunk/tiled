@@ -16,11 +16,12 @@ class TmxEntity extends Entity
 	public var tilemaps:Array<Graphic>;
 	public var map:TmxMap;
 
-	public function new(mapData:Dynamic, bitmapData:BitmapData, displayFunc:TileFunction) 
+	public function new(mapData:Dynamic, bitmapData:BitmapData, displayFunc:TileFunction = null, order:Array<String> = null) 
 	{
 		super();
 		var tilemap:Tilemap;
 		
+		var layers:Array<TmxLayer> = new Array<TmxLayer>();
 		tilemaps = new Array<Graphic>();
 		if (Std.is(mapData, TmxMap)) {
 			map = mapData;
@@ -28,7 +29,30 @@ class TmxEntity extends Entity
 			map = new TmxMap(mapData);
 		}
 		
-		for (layer in map.layers)
+		// Check for display function
+		if (displayFunc == null)
+		{
+			displayFunc = defaultFunc;
+		}
+		
+		// Check if we should be ordering the layers
+		if (order == null)
+		{
+			for (layer in map.layers)
+			{
+				layers.push(layer);
+			}
+		}
+		else
+		{
+			for (layer in order)
+			{
+				if (map.layers.exists(layer))
+					layers.push(map.layers.get(layer));
+			}
+		}
+		
+		for (layer in layers)
 		{
 			tilemap = new Tilemap(bitmapData, map.fullWidth, map.fullHeight, map.tileWidth, map.tileHeight);
 			// Loop through tile layer ids
@@ -49,9 +73,16 @@ class TmxEntity extends Entity
 		graphic = new Graphiclist(tilemaps);
 	}
 	
-	public function setCollidable(collideFunc:TileFunction, collideLayer:String = "collide")
+	private function defaultFunc(tile:Int, col:Int, row:Int):Bool
+	{
+		if (tile < 1) return false;
+		return true;
+	}
+	
+	public function setCollidable(collideFunc:TileFunction = null, collideLayer:String = "collide")
 	{
 		var collide:TmxLayer = null;
+		if (collideFunc == null) collideFunc = defaultFunc;
 		_grid = new Grid(map.fullWidth, map.fullHeight, map.tileWidth, map.tileHeight);
 		
 		for (layer in map.layers)

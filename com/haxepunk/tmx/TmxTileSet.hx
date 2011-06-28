@@ -108,7 +108,9 @@ class TmxTileSet
 
 	public function getPropertiesByGid(gid:Int):TmxPropertySet
 	{
-		return _tileProps[gid - firstGID];
+		if (_tileProps != null)
+			return _tileProps[gid - firstGID];
+		return null;
 	}
 	
 	public function getProperties(id:Int):TmxPropertySet

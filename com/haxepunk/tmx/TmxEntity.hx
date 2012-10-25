@@ -6,113 +6,93 @@ import com.haxepunk.graphics.Graphiclist;
 import com.haxepunk.graphics.Image;
 import com.haxepunk.graphics.Tilemap;
 import com.haxepunk.masks.Grid;
-import flash.display.BitmapData;
-
-typedef TileFunction = Int -> Int -> Int -> Bool;
 
 class TmxEntity extends Entity
 {
-	
-	public var tilemaps:Array<Graphic>;
+
 	public var map:TmxMap;
 
-	public function new(mapData:Dynamic, bitmapData:BitmapData, displayFunc:TileFunction = null, order:Array<String> = null) 
+	public function new(mapData:Dynamic)
 	{
 		super();
-		var tilemap:Tilemap;
-		
-		var layers:Array<TmxLayer> = new Array<TmxLayer>();
-		tilemaps = new Array<Graphic>();
-		if (Std.is(mapData, TmxMap)) {
+
+		if (Std.is(mapData, String))
+		{
+			map = new TmxMap(nme.Assets.getBytes(mapData));
+		}
+		else if (Std.is(mapData, TmxMap))
+		{
 			map = mapData;
-		} else {
-			map = new TmxMap(mapData);
-		}
-		
-		// Check for display function
-		if (displayFunc == null)
-		{
-			displayFunc = defaultFunc;
-		}
-		
-		// Check if we should be ordering the layers
-		if (order == null)
-		{
-			for (layer in map.layers)
-			{
-				layers.push(layer);
-			}
 		}
 		else
 		{
-			for (layer in order)
-			{
-				if (map.layers.exists(layer))
-					layers.push(map.layers.get(layer));
-			}
+			map = new TmxMap(mapData);
 		}
-		
-		for (layer in layers)
+	}
+
+	public function loadGraphic(tileset:Dynamic, layerNames:Array<String>, skip:Array<Int> = null)
+	{
+		var gid:Int, layer:TmxLayer;
+		for (name in layerNames)
 		{
-			tilemap = new Tilemap(bitmapData, map.fullWidth, map.fullHeight, map.tileWidth, map.tileHeight);
-			// Loop through tile layer ids
-			for (row in 0...layer.tileGIDs.length)
+			if (map.layers.exists(name) == false)
 			{
-				for (col in 0...layer.tileGIDs[row].length)
+#if debug
+				trace("Layer '" + name + "' doesn't exist");
+#end
+				continue;
+			}
+			layer = map.layers.get(name);
+
+			var tilemap = new Tilemap(tileset, map.fullWidth, map.fullHeight, map.tileWidth, map.tileHeight);
+			// Loop through tile layer ids
+			for (row in 0...layer.height)
+			{
+				for (col in 0...layer.width)
 				{
-					// if the tile is not null, set it
-					if (displayFunc(layer.tileGIDs[row][col], row, col))
+					gid = layer.tileGIDs[row][col] - 1;
+					if (gid < 0) continue;
+					if (skip == null || Lambda.has(skip, gid) == false)
 					{
-						tilemap.setTile(col, row, layer.tileGIDs[row][col] - 1);
+						tilemap.setTile(col, row, gid);
 					}
 				}
 			}
-			tilemaps.push(tilemap);
+			addGraphic(tilemap);
 		}
-		
-		graphic = new Graphiclist(tilemaps);
 	}
-	
-	private function defaultFunc(tile:Int, col:Int, row:Int):Bool
+
+	public function loadMask(collideLayer:String = "collide", typeName:String = "solid", skip:Array<Int> = null)
 	{
-		if (tile < 1) return false;
-		return true;
-	}
-	
-	public function setCollidable(collideFunc:TileFunction = null, collideLayer:String = "collide")
-	{
-		var collide:TmxLayer = null;
-		if (collideFunc == null) collideFunc = defaultFunc;
-		_grid = new Grid(map.fullWidth, map.fullHeight, map.tileWidth, map.tileHeight);
-		
-		for (layer in map.layers)
+		if (!map.layers.exists(collideLayer))
 		{
-			collide = layer;
-			if (layer.name == collideLayer)
-			{
-				break;
-			}
+#if debug
+				trace("Layer '" + collideLayer + "' doesn't exist");
+#end
+			return;
 		}
-		
-		if (collide == null) return;
-		
+
+		var gid:Int;
+		var layer:TmxLayer = map.layers.get(collideLayer);
+		var grid = new Grid(map.fullWidth, map.fullHeight, map.tileWidth, map.tileHeight);
+
 		// Loop through tile layer ids
-		for (row in 0...collide.tileGIDs.length)
+		for (row in 0...layer.height)
 		{
-			for (col in 0...collide.tileGIDs[row].length)
+			for (col in 0...layer.width)
 			{
-				if (collideFunc(collide.tileGIDs[row][col], row, col))
+				gid = layer.tileGIDs[row][col] - 1;
+				if (gid < 0) continue;
+				if (skip == null || Lambda.has(skip, gid) == false)
 				{
-					_grid.setTile(col, row, true);
+					grid.setTile(col, row, true);
 				}
 			}
 		}
-		
-		mask = _grid;
-		type = "solid";
-		setHitbox(_grid.width, _grid.height);
+
+		this.mask = grid;
+		this.type = type;
+		setHitbox(grid.width, grid.height);
 	}
-	
-	private var _grid:Grid;
-	
+
 }

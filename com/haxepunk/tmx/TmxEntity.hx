@@ -91,7 +91,7 @@ class TmxEntity extends Entity
 		}
 
 		this.mask = grid;
-		this.type = type;
+		this.type = typeName;
 		setHitbox(grid.width, grid.height);
 	}
 

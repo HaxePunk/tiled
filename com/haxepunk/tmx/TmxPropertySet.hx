@@ -12,7 +12,7 @@ class TmxPropertySet implements Dynamic<String>
 	
 	public function new()
 	{
-		keys = new Hash<String>();
+		keys = new Map<String,String>();
 	}
 	
 	public function resolve(name:String):String
@@ -29,5 +29,5 @@ class TmxPropertySet implements Dynamic<String>
 		}
 	}
 	
-	private var keys:Hash<String>;
+	private var keys:Map<String,String>;
 }

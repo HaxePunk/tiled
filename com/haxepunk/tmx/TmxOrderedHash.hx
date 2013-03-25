@@ -3,35 +3,35 @@ package com.haxepunk.tmx;
 class TmxOrderedHash<T>
 {
 	var _keys:Array<String>;
-	var _hash:Hash<T>;
+	var _map:Map<String,T>;
 
 	public function new()
 	{
 		_keys = new Array<String>();
-		_hash = new Hash<T>();
+		_map = new Map<String,T>();
 	}
 
 	public inline function set(key:String, value:T)
 	{
-		if (!_hash.exists(key)) _keys.push(key);
-		_hash.set(key,value);
+		if (!_map.exists(key)) _keys.push(key);
+		_map.set(key,value);
 	}
 
 	public inline function remove(key:String) : Bool
 	{
 		_keys.remove(key);
-		return _hash.remove(key);
+		return _map.remove(key);
 	}
 
-	public inline function exists(key:String) { return _hash.exists(key); }
-	public inline function get(key:String) { return _hash.get(key); }
+	public inline function exists(key:String) { return _map.exists(key); }
+	public inline function get(key:String) { return _map.get(key); }
 
 	public function iterator():Iterator<T>
 	{
 		var _keys_itr = _keys.iterator();
-		var __hash = _hash;
+		var __map = _map;
 		return {
-			next: function() { return __hash.get(_keys_itr.next()); },
+			next: function() { return __map.get(_keys_itr.next()); },
 			hasNext: _keys_itr.hasNext
 		}
 	}
@@ -43,8 +43,8 @@ class TmxOrderedHash<T>
 
 	public function toString()
 	{
-		var __hash = _hash;
-		var pairs = Lambda.map(_keys, function(x:String) { return x + ' => ' + __hash.get(x); });
+		var __map = _map;
+		var pairs = Lambda.map(_keys, function(x:String) { return x + ' => ' + __map.get(x); });
 		return  "{"+ pairs.join(', ') + "}";
 	}
 }

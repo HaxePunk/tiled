@@ -79,12 +79,12 @@ class TmxTileSet
 		}
 	}
 
-	public var image(getImage, setImage):BitmapData;
-	private function getImage():BitmapData
+	public var image(get_image, set_image):BitmapData;
+	private function get_image():BitmapData
 	{
 		return _image;
 	}
-	public function setImage(v:BitmapData):BitmapData
+	public function set_image(v:BitmapData):BitmapData
 	{
 		_image = v;
 		//TODO: consider spacing & margin

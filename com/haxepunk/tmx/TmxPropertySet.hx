@@ -9,17 +9,21 @@ import haxe.xml.Fast;
 
 class TmxPropertySet implements Dynamic<String>
 {
-	
+
 	public function new()
 	{
+#if haxe3
 		keys = new Map<String,String>();
+#else
+		keys = new Hash<String>();
+#end
 	}
-	
+
 	public function resolve(name:String):String
 	{
 		return keys.get(name);
 	}
-	
+
 	public function extend(source:Fast)
 	{
 		var prop:Fast;
@@ -28,6 +32,10 @@ class TmxPropertySet implements Dynamic<String>
 			keys.set(prop.att.name, prop.att.value);
 		}
 	}
-	
+
+#if haxe3
 	private var keys:Map<String,String>;
+#else
+	private var keys:Hash<String>;
+#end
 }

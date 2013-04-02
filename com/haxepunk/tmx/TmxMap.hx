@@ -72,6 +72,9 @@ class TmxMap
 		//load object group
 		for (node in source.nodes.objectgroup)
 			objectGroups.set(node.att.name, new TmxObjectGroup(node, this));
+
+		for (node in source.nodes.imagelayer)
+			imageLayers.set(node.att.name, new TmxImageLayer(node));
 	}
 
 	public function getLayer(name:String):TmxLayer

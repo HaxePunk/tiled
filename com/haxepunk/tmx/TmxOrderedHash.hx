@@ -3,12 +3,20 @@ package com.haxepunk.tmx;
 class TmxOrderedHash<T>
 {
 	var _keys:Array<String>;
+#if haxe3
 	var _map:Map<String,T>;
+#else
+	var _map:Hash<T>;
+#end
 
 	public function new()
 	{
 		_keys = new Array<String>();
+#if haxe3
 		_map = new Map<String,T>();
+#else
+		_map = new Hash<T>();
+#end
 	}
 
 	public inline function set(key:String, value:T)

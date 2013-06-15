@@ -18,7 +18,7 @@ class TmxEntity extends Entity
 
 		if (Std.is(mapData, String))
 		{
-			map = new TmxMap(nme.Assets.getBytes(mapData));
+			map = new TmxMap(Xml.parse(openfl.Assets.getText(mapData)));
 		}
 		else if (Std.is(mapData, TmxMap))
 		{

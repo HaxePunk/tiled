@@ -1,7 +1,0 @@
-<project name="HaxePunkTmx" url="http://haxepunk.com" license="MIT">
-	<user name="heardtheword" />
-	<tag v="game" />
-	<depends name="HaxePunk" />
-	<description>Tiled TMX loader for HaxePunk</description>
-	<version name="1.0.1">Ready for Haxe 3</version>
-</project>

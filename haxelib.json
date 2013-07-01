@@ -1,0 +1,10 @@
+{
+	"name": "HaxePunkTmx",
+	"url" : "http://haxepunk.com",
+	"license": "MIT",
+	"tags": ["game", "haxepunk"],
+	"description": "Tiled TMX loader for HaxePunk",
+	"version": "1.0.2",
+	"releasenote": "Updated for Haxe 3",
+	"contributors": ["heardtheword"]
+}

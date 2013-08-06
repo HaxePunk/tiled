@@ -64,12 +64,13 @@ class TmxEntity extends Entity
 
 	public function loadMask(collideLayer:String = "collide", typeName:String = "solid", skip:Array<Int> = null)
 	{
+		var tileCoords:Array<TmxVec4> = new Array<TmxVec4>();
 		if (!map.layers.exists(collideLayer))
 		{
 #if debug
 				trace("Layer '" + collideLayer + "' doesn't exist");
 #end
-			return;
+			return tileCoords;
 		}
 
 		var gid:Int;
@@ -86,6 +87,7 @@ class TmxEntity extends Entity
 				if (skip == null || Lambda.has(skip, gid) == false)
 				{
 					grid.setTile(col, row, true);
+					tileCoords.push(new TmxVec4(col*map.tileWidth, row*map.tileHeight, map.tileWidth, map.tileHeight));
 				}
 			}
 		}
@@ -93,6 +95,7 @@ class TmxEntity extends Entity
 		this.mask = grid;
 		this.type = typeName;
 		setHitbox(grid.width, grid.height);
+		return tileCoords;
 	}
 
 }

@@ -151,12 +151,14 @@ class TmxLayer
 		var result:Array<Array<Int>> = new Array<Array<Int>>();
 		var data:ByteArray = base64ToByteArray(chunk);
 		if(compressed)
-			#if js
-			throw "No support for compressed maps in html5 target!";
-			#end
-			#if !js
+		{
+			#if (js && !format)
+			throw "Need the format library to use compressed map on html5";
+			#else 
 			data.uncompress();
 			#end
+		}
+			
 		data.endian = Endian.LITTLE_ENDIAN;
 		while(data.position < data.length)
 		{

@@ -8,6 +8,12 @@ package com.haxepunk.tmx;
 import haxe.xml.Fast;
 import flash.utils.ByteArray;
 
+#if nme
+import nme.Assets;
+#else
+import openfl.Assets;
+#end
+
 class TmxMap
 {
 	public var version:String;
@@ -75,6 +81,11 @@ class TmxMap
 
 		// for (node in source.nodes.imagelayer)
 		// 	imageLayers.set(node.att.name, new TmxImageLayer(node));
+	}
+	
+	public static function loadFromFile(name:String):TmxMap
+	{
+		return new TmxMap(Assets.getText(name));
 	}
 
 	public function getLayer(name:String):TmxLayer

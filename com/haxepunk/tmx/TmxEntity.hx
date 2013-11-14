@@ -44,7 +44,12 @@ class TmxEntity extends Entity
 			}
 			layer = map.layers.get(name);
 
-			var tilemap = new Tilemap(tileset, map.fullWidth, map.fullHeight, map.tileWidth, map.tileHeight);
+#if flash
+			var _tileset = openfl.Assets.getBitmapData(tileset);
+#else
+			var _tileset = new com.haxepunk.graphics.atlas.TileAtlas(tileset, map.tileWidth, map.tileHeight);
+#end
+			var tilemap = new Tilemap(_tileset, map.fullWidth, map.fullHeight, map.tileWidth, map.tileHeight);
 			// Loop through tile layer ids
 			for (row in 0...layer.height)
 			{

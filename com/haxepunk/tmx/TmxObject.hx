@@ -5,6 +5,7 @@
  ******************************************************************************/
 package com.haxepunk.tmx;
 import haxe.xml.Fast;
+import com.haxepunk.masks.Hitbox;
 
 class TmxObject
 {
@@ -18,6 +19,11 @@ class TmxObject
 	public var gid:Int;
 	public var custom:TmxPropertySet;
 	public var shared:TmxPropertySet;
+	public var shapeMask:Hitbox;
+
+	#if debug
+	public var debug_graphic:com.haxepunk.graphics.Image;
+	#end
 	
 	public function new(source:Fast, parent:TmxObjectGroup)
 	{
@@ -48,5 +54,25 @@ class TmxObject
 		custom = new TmxPropertySet();
 		for (node in source.nodes.properties)
 			custom.extend(node);
+
+		// create shape, cannot do ellipses, only circles
+		if(source.hasNode.ellipse){
+			var radius = Std.int(((width < height)? width : height)/2);
+			shapeMask = new com.haxepunk.masks.Circle(radius, x, y);
+
+#if debug
+			debug_graphic = com.haxepunk.graphics.Image.createCircle(radius, 0xff0000, .6);
+			debug_graphic.x = x;
+			debug_graphic.y = y;
+#end
+		}else{ // rect
+			shapeMask = new com.haxepunk.masks.Hitbox(width, height, x, y);
+
+#if debug
+			debug_graphic = com.haxepunk.graphics.Image.createRect(width, height, 0xff0000, .6);
+			debug_graphic.x = x;
+			debug_graphic.y = y;
+#end
+		}
 	}
 }

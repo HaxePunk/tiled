@@ -12,6 +12,7 @@ class TmxEntity extends Entity
 {
 
 	public var map:TmxMap;
+	public var debugObjectMask:Bool;
 
 	public function new(mapData:Dynamic)
 	{
@@ -29,6 +30,9 @@ class TmxEntity extends Entity
 		{
 			map = new TmxMap(mapData);
 		}
+#if debug
+		debugObjectMask = true;
+#end
 	}
 
 	public function loadGraphic(tileset:Dynamic, layerNames:Array<String>, skip:Array<Int> = null)
@@ -132,8 +136,10 @@ class TmxEntity extends Entity
 		}
 
 #if debug
-		var debug_graphicList = new Graphiclist(debug_graphics_ar);
-		this.addGraphic(debug_graphicList);
+		if(debugObjectMask){
+			var debug_graphicList = new Graphiclist(debug_graphics_ar);
+			this.addGraphic(debug_graphicList);
+		}
 #end
 		
 		var maskList = new Masklist(masks_ar);

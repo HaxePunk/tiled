@@ -19,8 +19,8 @@ class TmxTileSet
 	public var name:String;
 	public var tileWidth:Int;
 	public var tileHeight:Int;
-	public var spacing:Int;
-	public var margin:Int;
+	public var spacing:Int=0;
+	public var margin:Int=0;
 	public var imageSource:String;
 
 	//available only after immage has been assigned:

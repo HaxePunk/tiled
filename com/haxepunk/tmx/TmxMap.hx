@@ -110,4 +110,21 @@ class TmxMap
 		}
 		return null;
 	}
+	
+	public function getTileMapSpacing(name:String):Int
+	{
+		var index = -1;
+		var i = 0;
+		for (key in layers.keys())
+			if (key == name)
+			{
+				index = i;
+				break;
+			}
+			i++;
+			
+		if (index == -1)
+			return 0;
+		return tilesets[index].spacing;
+	}
 }

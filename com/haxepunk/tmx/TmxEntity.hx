@@ -43,8 +43,9 @@ class TmxEntity extends Entity
 				continue;
 			}
 			layer = map.layers.get(name);
+			var spacing = map.getTileMapSpacing(name);
 
-			var tilemap = new Tilemap(tileset, map.fullWidth, map.fullHeight, map.tileWidth, map.tileHeight);
+			var tilemap = new Tilemap(tileset, map.fullWidth, map.fullHeight, map.tileWidth, map.tileHeight,spacing, spacing);
 			// Loop through tile layer ids
 			for (row in 0...layer.height)
 			{

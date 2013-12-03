@@ -6,11 +6,13 @@ import com.haxepunk.graphics.Graphiclist;
 import com.haxepunk.graphics.Image;
 import com.haxepunk.graphics.Tilemap;
 import com.haxepunk.masks.Grid;
+import com.haxepunk.masks.Masklist;
 
 class TmxEntity extends Entity
 {
 
 	public var map:TmxMap;
+	public var debugObjectMask:Bool;
 
 	public function new(mapData:Dynamic)
 	{
@@ -28,6 +30,9 @@ class TmxEntity extends Entity
 		{
 			map = new TmxMap(mapData);
 		}
+#if debug
+		debugObjectMask = true;
+#end
 	}
 
 	public function loadGraphic(tileset:Dynamic, layerNames:Array<String>, skip:Array<Int> = null)
@@ -44,7 +49,12 @@ class TmxEntity extends Entity
 			}
 			layer = map.layers.get(name);
 
-			var tilemap = new Tilemap(tileset, map.fullWidth, map.fullHeight, map.tileWidth, map.tileHeight);
+#if flash
+			var _tileset = openfl.Assets.getBitmapData(tileset);
+#else
+			var _tileset = new com.haxepunk.graphics.atlas.TileAtlas(tileset, map.tileWidth, map.tileHeight);
+#end
+			var tilemap = new Tilemap(_tileset, map.fullWidth, map.fullHeight, map.tileWidth, map.tileHeight);
 			// Loop through tile layer ids
 			for (row in 0...layer.height)
 			{
@@ -93,6 +103,49 @@ class TmxEntity extends Entity
 		this.mask = grid;
 		this.type = typeName;
 		setHitbox(grid.width, grid.height);
+	}
+
+	/*
+		debugging shapes of object mask is only availble in -flash
+		currently only supports ellipse object (circles only), and rectangle objects
+			no polygons yet
+	*/
+	public function loadObjectMask(collideLayer:String = "objects", typeName:String = "solidObject")
+	{	
+		if (map.getObjectGroup(collideLayer) == null)
+		{
+#if debug
+				trace("ObjectGroup '" + collideLayer + "' doesn't exist");
+#end
+			return;
+		}
+
+		var objectGroup:TmxObjectGroup = map.getObjectGroup(collideLayer);
+		
+		var masks_ar = new Array<Dynamic>();
+#if debug
+		var debug_graphics_ar = new Array<Dynamic>();
+#end
+
+		// Loop through objects
+		for(object in objectGroup.objects){ // :TmxObject
+			masks_ar.push(object.shapeMask);
+#if debug
+			debug_graphics_ar.push(object.debug_graphic);
+#end
+		}
+
+#if debug
+		if(debugObjectMask){
+			var debug_graphicList = new Graphiclist(debug_graphics_ar);
+			this.addGraphic(debug_graphicList);
+		}
+#end
+		
+		var maskList = new Masklist(masks_ar);
+		this.mask = maskList;
+		this.type = typeName;
+		
 	}
 
 }

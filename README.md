@@ -8,6 +8,8 @@
 
 To use this as a background image simply create a new instance of TmxEntity.
 
+    import com.haxepunk.tmx.TmxEntity;
+    
     public function createMap()
     {
       // create the map
@@ -27,10 +29,13 @@ To use this as a background image simply create a new instance of TmxEntity.
 To access map properties and object layers create an instance of TmxMap.
 To add it to the scene simply pass the TmxMap object to the TmxEntity constructor.
 
+	import com.haxepunk.tmx.TmxEntity;
+	import com.haxepunk.tmx.TmxMap;
+
 	public function createMap()
 	{
 		// create the map
-		var m = TmxMap.loadFromFile("maps/mylevel.tmx");
+		var map = TmxMap.loadFromFile("maps/mylevel.tmx");
 		
 		// access map properties
 		var prop = map.properties.resolve("myCustomProperties");

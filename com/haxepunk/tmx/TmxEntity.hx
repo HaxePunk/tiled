@@ -34,6 +34,19 @@ class TmxEntity extends Entity
 		debugObjectMask = true;
 #end
 	}
+	
+	public function loadImageLayer(name:String)
+	{
+		if (map.imageLayers.exists(name) == false)
+		{
+#if debug
+			trace("Image layer '" + name + "' doesn't exist");
+#end
+			return;
+		}
+		
+		addGraphic(new Image(map.imageLayers.get(name)));		
+	}
 
 	public function loadGraphic(tileset:Dynamic, layerNames:Array<String>, skip:Array<Int> = null)
 	{

@@ -29,6 +29,7 @@ class TmxMap
 	public var properties(default, null):TmxPropertySet;
 	public var tilesets:Array<TmxTileSet>;
 	public var layers:TmxOrderedHash<TmxLayer>;
+	public var imageLayers:Map<String, String>;
 	public var objectGroups:TmxOrderedHash<TmxObjectGroup>;
 
 	public function new(data:Dynamic)
@@ -44,6 +45,7 @@ class TmxMap
 
 		tilesets = new Array<TmxTileSet>();
 		layers = new TmxOrderedHash<TmxLayer>();
+		imageLayers = new Map<String, String>();
 		objectGroups = new TmxOrderedHash<TmxObjectGroup>();
 
 		source = source.node.map;
@@ -74,6 +76,15 @@ class TmxMap
 		//load layer
 		for (node in source.nodes.layer)
 			layers.set(node.att.name, new TmxLayer(node, this));
+			
+		//load image layer
+		for (node in source.nodes.imagelayer)
+		{
+			for (img in node.nodes.image)
+			{
+				imageLayers.set(node.att.name, img.att.source.substr(3));
+			}
+		}
 
 		//load object group
 		for (node in source.nodes.objectgroup)

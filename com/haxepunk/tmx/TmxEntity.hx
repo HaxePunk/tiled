@@ -48,13 +48,15 @@ class TmxEntity extends Entity
 				continue;
 			}
 			layer = map.layers.get(name);
+			var spacing = map.getTileMapSpacing(name);
 
 #if flash
 			var _tileset = openfl.Assets.getBitmapData(tileset);
 #else
-			var _tileset = new com.haxepunk.graphics.atlas.TileAtlas(tileset, map.tileWidth, map.tileHeight);
+			var _tileset = new com.haxepunk.graphics.atlas.TileAtlas(tileset, map.tileWidth, map.tileHeight, spacing, spacing);
 #end
-			var tilemap = new Tilemap(_tileset, map.fullWidth, map.fullHeight, map.tileWidth, map.tileHeight);
+			var tilemap = new Tilemap(_tileset, map.fullWidth, map.fullHeight, map.tileWidth, map.tileHeight, spacing, spacing);
+
 			// Loop through tile layer ids
 			for (row in 0...layer.height)
 			{

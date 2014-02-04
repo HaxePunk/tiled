@@ -7,6 +7,22 @@ import com.haxepunk.graphics.Image;
 import com.haxepunk.graphics.Tilemap;
 import com.haxepunk.masks.Grid;
 import com.haxepunk.masks.Masklist;
+import com.haxepunk.tmx.TmxMap;
+
+abstract Map(TmxMap)
+{
+	private inline function new(map:TmxMap) this = map;
+	@:to public inline function toMap():TmxMap return this;
+
+	@:from public static inline function fromString(s:String)
+		return new Map(new TmxMap(Xml.parse(openfl.Assets.getText(s))));
+
+	@:from public static inline function fromTmxMap(map:TmxMap)
+		return new Map(map);
+
+	@:from public static inline function fromMapData(mapData:MapData)
+		return new Map(new TmxMap(mapData));
+}
 
 class TmxEntity extends Entity
 {
@@ -14,27 +30,16 @@ class TmxEntity extends Entity
 	public var map:TmxMap;
 	public var debugObjectMask:Bool;
 
-	public function new(mapData:Dynamic)
+	public function new(mapData:Map)
 	{
 		super();
 
-		if (Std.is(mapData, String))
-		{
-			map = new TmxMap(Xml.parse(openfl.Assets.getText(mapData)));
-		}
-		else if (Std.is(mapData, TmxMap))
-		{
-			map = mapData;
-		}
-		else
-		{
-			map = new TmxMap(mapData);
-		}
+		map = mapData;
 #if debug
 		debugObjectMask = true;
 #end
 	}
-	
+
 	public function loadImageLayer(name:String)
 	{
 		if (map.imageLayers.exists(name) == false)
@@ -44,11 +49,11 @@ class TmxEntity extends Entity
 #end
 			return;
 		}
-		
-		addGraphic(new Image(map.imageLayers.get(name)));		
+
+		addGraphic(new Image(map.imageLayers.get(name)));
 	}
 
-	public function loadGraphic(tileset:Dynamic, layerNames:Array<String>, skip:Array<Int> = null)
+	public function loadGraphic(tileset:String, layerNames:Array<String>, skip:Array<Int> = null)
 	{
 		var gid:Int, layer:TmxLayer;
 		for (name in layerNames)
@@ -63,12 +68,7 @@ class TmxEntity extends Entity
 			layer = map.layers.get(name);
 			var spacing = map.getTileMapSpacing(name);
 
-#if flash
-			var _tileset = openfl.Assets.getBitmapData(tileset);
-#else
-			var _tileset = new com.haxepunk.graphics.atlas.TileAtlas(tileset, map.tileWidth, map.tileHeight, spacing, spacing);
-#end
-			var tilemap = new Tilemap(_tileset, map.fullWidth, map.fullHeight, map.tileWidth, map.tileHeight, spacing, spacing);
+			var tilemap = new Tilemap(tileset, map.fullWidth, map.fullHeight, map.tileWidth, map.tileHeight, spacing, spacing);
 
 			// Loop through tile layer ids
 			for (row in 0...layer.height)
@@ -126,7 +126,7 @@ class TmxEntity extends Entity
 			no polygons yet
 	*/
 	public function loadObjectMask(collideLayer:String = "objects", typeName:String = "solidObject")
-	{	
+	{
 		if (map.getObjectGroup(collideLayer) == null)
 		{
 #if debug
@@ -136,7 +136,7 @@ class TmxEntity extends Entity
 		}
 
 		var objectGroup:TmxObjectGroup = map.getObjectGroup(collideLayer);
-		
+
 		var masks_ar = new Array<Dynamic>();
 #if debug
 		var debug_graphics_ar = new Array<Dynamic>();
@@ -156,11 +156,11 @@ class TmxEntity extends Entity
 			this.addGraphic(debug_graphicList);
 		}
 #end
-		
+
 		var maskList = new Masklist(masks_ar);
 		this.mask = maskList;
 		this.type = typeName;
-		
+
 	}
 
 }

@@ -14,6 +14,21 @@ import nme.Assets;
 import openfl.Assets;
 #end
 
+abstract MapData(Fast)
+{
+	private inline function new(f:Fast) this = f;
+	@:to public inline function toMap():Fast return this;
+
+	@:from public static inline function fromString(s:String)
+		return new MapData(new Fast(Xml.parse(s)));
+
+	@:from public static inline function fromXml(xml:Xml)
+		return new MapData(new Fast(xml));
+
+	@:from public static inline function fromByteArray(ba:ByteArray)
+		return new MapData(new Fast(Xml.parse(ba.toString())));
+}
+
 class TmxMap
 {
 	public var version:String;
@@ -32,16 +47,13 @@ class TmxMap
 	public var imageLayers:Map<String, String>;
 	public var objectGroups:TmxOrderedHash<TmxObjectGroup>;
 
-	public function new(data:Dynamic)
+	public function new(data:MapData)
 	{
 		properties = new TmxPropertySet();
 		var source:Fast = null;
 		var node:Fast = null;
 
-		if (Std.is(data, String)) source = new Fast(Xml.parse(data));
-		else if (Std.is(data, Xml)) source = new Fast(data);
-		else if (Std.is(data, ByteArray)) source = new Fast(Xml.parse(data.toString()));
-		else throw "Unknown TMX map format";
+		source = data;
 
 		tilesets = new Array<TmxTileSet>();
 		layers = new TmxOrderedHash<TmxLayer>();
@@ -76,7 +88,7 @@ class TmxMap
 		//load layer
 		for (node in source.nodes.layer)
 			layers.set(node.att.name, new TmxLayer(node, this));
-			
+
 		//load image layer
 		for (node in source.nodes.imagelayer)
 		{
@@ -93,7 +105,7 @@ class TmxMap
 		// for (node in source.nodes.imagelayer)
 		// 	imageLayers.set(node.att.name, new TmxImageLayer(node));
 	}
-	
+
 	public static function loadFromFile(name:String):TmxMap
 	{
 		return new TmxMap(Assets.getText(name));
@@ -121,7 +133,7 @@ class TmxMap
 		}
 		return null;
 	}
-	
+
 	public function getTileMapSpacing(name:String):Int
 	{
 		var index = -1;
@@ -133,7 +145,7 @@ class TmxMap
 				break;
 			}
 			i++;
-			
+
 		if (index == -1)
 			return 0;
 		return tilesets[index].spacing;

@@ -10,6 +10,20 @@ import flash.geom.Rectangle;
 import flash.utils.ByteArray;
 import haxe.xml.Fast;
 
+abstract TileSetData(Fast)
+{
+	private inline function new(f:Fast) this = f;
+	@:to public inline function toMap():Fast return this;
+
+	@:from public static inline function fromFast(f:Fast)
+		return new TileSetData(f);
+
+	@:from public static inline function fromByteArray(ba:ByteArray) {
+		var f = new Fast(Xml.parse(ba.toString()));
+		return new TileSetData(f.node.tileset);
+	}
+}
+
 class TmxTileSet
 {
 	private var _tileProps:Array<TmxPropertySet>;
@@ -23,28 +37,18 @@ class TmxTileSet
 	public var margin:Int=0;
 	public var imageSource:String;
 
-	//available only after immage has been assigned:
+	//available only after image has been assigned:
 	public var numTiles:Int;
 	public var numRows:Int;
 	public var numCols:Int;
 
-	public function new(data:Dynamic)
+	public function new(data:TileSetData)
 	{
 		var node:Fast, source:Fast;
 		numTiles = 0xFFFFFF;
 		numRows = numCols = 1;
 
-		// Use the correct data format
-		if (Std.is(data, Fast))
-		{
-			source = data;
-		}
-		else if (Std.is(data, ByteArray))
-		{
-			source = new Fast(Xml.parse(data.toString()));
-			source = source.node.tileset;
-		}
-		else throw "Unknown TMX tileset format";
+		source = data;
 
 		firstGID = (source.has.firstgid) ? Std.parseInt(source.att.firstgid) : 1;
 

@@ -133,6 +133,18 @@ class TmxMap
 		}
 		return null;
 	}
+	
+	public function getGidProperty(gid:Int, property:String)
+	{
+		var last:TmxTileSet = null;
+		var set:TmxTileSet;
+		for (set in tilesets)
+		{
+			if(set.hasGid(gid) && set.getPropertiesByGid(gid) != null)
+				return set.getPropertiesByGid(gid).resolve(property);
+		}
+		return null;
+	}
 
 	public function getTileMapSpacing(name:String):Int
 	{

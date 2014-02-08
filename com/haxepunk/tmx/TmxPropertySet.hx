@@ -24,6 +24,11 @@ class TmxPropertySet implements Dynamic<String>
 		return keys.get(name);
 	}
 
+	public function has(name:String):Bool
+	{
+		return keys.exists(name);
+	}
+
 	public function extend(source:Fast)
 	{
 		var prop:Fast;

@@ -10,7 +10,7 @@ import com.haxepunk.masks.SlopedGrid;
 import com.haxepunk.masks.Masklist;
 import com.haxepunk.tmx.TmxMap;
 
-abstract Map(TmxMap)
+private abstract Map(TmxMap)
 {
 	private inline function new(map:TmxMap) this = map;
 	@:to public inline function toMap():TmxMap return this;

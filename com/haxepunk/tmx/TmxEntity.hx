@@ -195,7 +195,7 @@ class TmxEntity extends Entity
 
 		var masks_ar = new Array<Dynamic>();
 #if debug
-		var debug_graphics_ar = new Array<Dynamic>();
+		var debug_graphics_ar = new Array<Graphic>();
 #end
 
 		// Loop through objects

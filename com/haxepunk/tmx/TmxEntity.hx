@@ -9,6 +9,14 @@ import com.haxepunk.masks.Grid;
 import com.haxepunk.masks.SlopedGrid;
 import com.haxepunk.masks.Masklist;
 import com.haxepunk.tmx.TmxMap;
+import com.haxepunk.tmx.TmxTileSet;
+import com.haxepunk.tmx.TmxCollisionObject;
+import com.haxepunk.masks.Circle;
+import com.haxepunk.masks.Hitbox;
+import com.haxepunk.masks.Polygon;
+import flash.geom.Rectangle;
+import com.haxepunk.graphics.atlas.TileAtlas;
+
 
 private abstract TmxMapData(TmxMap)
 {

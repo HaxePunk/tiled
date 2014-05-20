@@ -5,10 +5,13 @@
  ******************************************************************************/
 package com.haxepunk.tmx;
 
+import com.haxepunk.Mask;
+import com.haxepunk.masks.Masklist;
 import flash.display.BitmapData;
 import flash.geom.Rectangle;
 import flash.utils.ByteArray;
 import haxe.xml.Fast;
+import openfl.Assets;
 
 abstract TileSetData(Fast)
 {
@@ -27,6 +30,7 @@ abstract TileSetData(Fast)
 class TmxTileSet
 {
 	private var _tileProps:Array<TmxPropertySet>;
+	private var _tileCollisions:Array<Array<TmxCollisionObject>>;
 	private var _image:BitmapData;
 
 	public var firstGID:Int;
@@ -36,6 +40,9 @@ class TmxTileSet
 	public var spacing:Int=0;
 	public var margin:Int=0;
 	public var imageSource:String;
+	public var offsetX:Int;
+	public var offsetY:Int;
+	public static var autoLoadImage:Bool = true;
 
 	//available only after image has been assigned:
 	public var numTiles:Int;
@@ -47,38 +54,92 @@ class TmxTileSet
 		var node:Fast, source:Fast;
 		numTiles = 0xFFFFFF;
 		numRows = numCols = 1;
+		offsetX = offsetY = 0;
 
 		source = data;
 
 		firstGID = (source.has.firstgid) ? Std.parseInt(source.att.firstgid) : 1;
-
 		// check for external source
 		if (source.has.source)
 		{
-
+			source = new Fast(Xml.parse(Assets.getText(TmxMap.patternsPath + source.att.source)));
+			source = source.node.tileset;
+			//trace(source.node.image);
 		}
-		else // internal
+
+		node = source.node.image;
+		imageSource = node.att.source;
+
+		name = source.att.name;
+		if (source.has.tilewidth) tileWidth = Std.parseInt(source.att.tilewidth);
+		if (source.has.tileheight) tileHeight = Std.parseInt(source.att.tileheight);
+		if (source.has.spacing) spacing = Std.parseInt(source.att.spacing);
+		if (source.has.margin) margin = Std.parseInt(source.att.margin);
+		if (source.hasNode.tileoffset)
 		{
-			var node:Fast = source.node.image;
-			imageSource = node.att.source;
+			offsetX = Std.parseInt(source.node.tileoffset.att.x);
+			offsetY = Std.parseInt(source.node.tileoffset.att.y);
+		}
 
-			name = source.att.name;
-			if (source.has.tilewidth) tileWidth = Std.parseInt(source.att.tilewidth);
-			if (source.has.tileheight) tileHeight = Std.parseInt(source.att.tileheight);
-			if (source.has.spacing) spacing = Std.parseInt(source.att.spacing);
-			if (source.has.margin) margin = Std.parseInt(source.att.margin);
-
-			//read properties
-			_tileProps = new Array<TmxPropertySet>();
-			for (node in source.nodes.tile)
+		//read properties
+		_tileProps = new Array<TmxPropertySet>();
+		_tileCollisions = new Array<Array<TmxCollisionObject>>();
+		for (node in source.nodes.tile)
+		{
+			if (node.has.id)
 			{
-				if (node.has.id)
+				var id:Int = Std.parseInt(node.att.id);
+				_tileProps[id] = new TmxPropertySet();
+				for (prop in node.nodes.properties)
+					_tileProps[id].extend(prop);
+
+				if (node.hasNode.objectgroup)
 				{
-					var id:Int = Std.parseInt(node.att.id);
-					_tileProps[id] = new TmxPropertySet();
-					for (prop in node.nodes.properties)
-						_tileProps[id].extend(prop);
+					var _og:Fast = node.node.objectgroup;
+					_tileCollisions[id] = new Array<TmxCollisionObject>();
+					for (og in _og.nodes.object)
+					{
+						var x = Std.parseFloat(og.att.x);
+						var y = Std.parseFloat(og.att.y);
+						var w = og.has.width ? Std.parseFloat(og.att.width) : tileWidth;
+						var h = og.has.height ? Std.parseFloat(og.att.height) : tileHeight;
+
+						if (og.hasNode.polygon)
+						{
+							var points:Array<String> = og.node.polygon.att.points.split(" ");
+							var pArr:Array<Float> = new Array<Float>();
+							for (pS in points) {
+								pArr.push( x + Std.parseFloat(pS.split(",")[0]));
+								pArr.push( y + Std.parseFloat(pS.split(",")[1]));
+							}
+							_tileCollisions[id].push(new TmxCollisionObject(x, y, w, h, "poly", 0, pArr));
+						}
+						else if (og.hasNode.ellipse) {
+							var radius = Std.int(((w < h)? w : h)/2);
+							_tileCollisions[id].push(new TmxCollisionObject(x, y, w, h, "circle", radius));
+						}else { // rect
+							_tileCollisions[id].push(new TmxCollisionObject(x, y, w, h));
+						}
+					}
 				}
+			}
+		}
+
+		if (autoLoadImage && imageSource != null && imageSource != "" )
+		{
+			if (Assets.exists(imageSource, AssetType.IMAGE))
+			{
+				image = Assets.getBitmapData(imageSource);
+			}
+			else if (Assets.exists(imageSource.substring(3), AssetType.IMAGE))
+			{
+				image = Assets.getBitmapData(imageSource.substring(3));
+			}
+			else
+			{
+				#if debug
+				trace("Cannot load image source", imageSource);
+				#end
 			}
 		}
 	}
@@ -128,6 +189,13 @@ class TmxTileSet
 	public function getRect(id:Int):Rectangle
 	{
 		//TODO: consider spacing & margin
-		return new Rectangle((id % numCols) * tileWidth, (id / numCols) * tileHeight);
+		return new Rectangle( Std.int(id % numCols) * tileWidth , Std.int(id / numCols) * tileHeight, tileWidth, tileHeight);
+	}
+
+	public function getCollisionsByGid(gid:Int):Array<TmxCollisionObject>
+	{
+		if (_tileCollisions != null)
+			return _tileCollisions[gid];
+		return null;
 	}
 }

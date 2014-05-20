@@ -88,6 +88,158 @@ class TmxEntity extends Entity
 		}
 	}
 
+	/**
+	 * Loads all graphics for the layers in layerNames and, optionally, loads collision information from tiles and sets masks with that
+	 * @param	layerNames 		layers you want to show
+	 * @param	skip 			gid of tiles that should be skipped.
+	 * @param	collideLayer 	the name of the layer to collide with. (ignored if addTileMask = false)
+	 * @param	addTileMask 	if we should process tile collision information and generate a mask.
+	 * @param	typeName		the type to set for masks.
+	 */
+	public function loadGraphics(layerNames:Array<String>, skip:Array<Int> = null, collideLayer:String = "collide", addTileMask:Bool = false, typeName:String = "solid"):Void
+	{
+		var gid:Int;
+		var layer:TmxLayer;
+		var ml:Masklist = null;
+		var tilesCollisions:Array<TmxCollisionObject> = new Array<TmxCollisionObject>();
+		var tileMaps:TmxOrderedHash<TmxTilemap> = new TmxOrderedHash<TmxTilemap>();
+
+		for (name in layerNames)
+		{
+			if (map.layers.exists(name) == false)
+			{
+#if debug
+				trace("Layer '" + name + "' doesn't exist");
+#end
+				continue;
+			}
+			layer = map.layers.get(name);
+			if (!layer.visible)
+			{
+#if debug
+				trace("Layer '" + name + "' is not visible.");
+#end
+				continue;
+			}
+			for (row in 0...layer.height)
+			{
+				for (col in 0...layer.width)
+				{
+					gid = layer.tileGIDs[row][col];
+					if (gid < 0) continue;
+					var set = map.getGidOwner(gid);
+					if (set == null)
+						continue;
+					gid -= set.firstGID;
+
+					if (gid < 0) continue;
+
+					if (!tileMaps.exists( name + "_" + set.name))
+					{
+						#if flash
+						var _tileset = set.image;
+						#else
+						var _tileset = new TileAtlas(set.image);
+						#end
+						var tm:TmxTilemap = new TmxTilemap(_tileset, map.fullWidth, map.fullHeight, map.tileWidth, map.tileHeight, set.spacing, set.spacing, set.offsetX, set.offsetY);
+						tileMaps.set(name + "_" + set.name, tm);
+					}
+
+					if (skip == null || Lambda.has(skip, gid) == false)
+					{
+						if (addTileMask && name == collideLayer)
+						{
+							var tileMask:Array<TmxCollisionObject> = set.getCollisionsByGid(gid);
+							if (tileMask != null && tileMask.length > 0)
+							{
+								var rect:Rectangle = new Rectangle(x + (col * set.tileWidth), y + (row * set.tileHeight), set.tileWidth, set.tileHeight);
+								for (colObj in tileMask)
+								{
+									var _colObj:TmxCollisionObject = new TmxCollisionObject(colObj.x + rect.x, colObj.y + rect.y, colObj.width, colObj.height, colObj.type, colObj.radius, colObj.polyPoints);
+									if (_colObj.type == "poly")
+									{
+										var pArr:Array<Float> = new Array<Float>();
+										var even:Bool = true;
+										for (p in _colObj.polyPoints)
+										{
+											pArr.push(p + (even ? rect.x : rect.y));
+											even = !even;
+										}
+										_colObj.polyPoints = pArr;
+									}
+									tilesCollisions.push(_colObj);
+								}
+							}
+							else
+							{
+								#if debug
+								trace("You have a tile in layer " + name + " with id: " + gid + " that has no collision setup");
+								#end
+							}
+						}
+						tileMaps.get(name + "_" + set.name).setTile(col, row, gid);
+					}
+				}
+			}
+			for (tm in tileMaps)
+			{
+				addGraphic(tm);
+			}
+		}
+		if (addTileMask && tilesCollisions.length > 0)
+		{
+			var co:TmxCollisionObject;
+			var masks:Array<Mask> = new Array<Mask>();
+			for (co in tilesCollisions)
+			{
+				switch (co.type)
+				{
+					case "circle":
+						masks.push(new Circle(co.radius, Std.int(co.x), Std.int(co.y)));
+						#if debug
+						trace("Adding circle mask");
+						if (debugObjectMask)
+						{
+							var c = Image.createCircle(co.radius, 0xFF0000, 0.5);
+							c.x = Std.int(co.x);
+							c.y = Std.int(co.y);
+							addGraphic(c);
+						}
+						#end
+					case "poly":
+						var p:Polygon = Polygon.createFromArray(co.polyPoints);
+						p.x = 0;
+						p.y = 0;
+						masks.push(p);
+						#if debug
+						trace("Adding poly mask");
+						if (debugObjectMask)
+						{
+							var i:Image = Image.createPolygon(p, 0xFF0000, 0.5);
+							addGraphic(i);
+						}
+						#end
+					case "box":
+						masks.push( new Hitbox(Std.int(co.width), Std.int(co.height), Std.int(co.x), Std.int(co.y)));
+						#if debug
+						trace("Adding box mask");
+						if (debugObjectMask)
+						{
+							var i:Image = Image.createRect(Std.int(co.width), Std.int(co.height), 0xFF0000, 0.5);
+							i.x = Std.int(co.x);
+							i.y = Std.int(co.y);
+							addGraphic(i);
+						}
+						#end
+				}
+			}
+			ml = new Masklist(masks);
+			mask = ml;
+			this.type = typeName;
+			setHitbox(map.fullWidth, map.fullHeight);
+		}
+	}
+
 	public function loadMask(collideLayer:String = "collide", typeName:String = "solid", skip:Array<Int> = null)
 	{
 		var tileCoords:Array<TmxVec4> = new Array<TmxVec4>();

@@ -46,6 +46,7 @@ class TmxMap
 	public var layers:TmxOrderedHash<TmxLayer>;
 	public var imageLayers:Map<String, String>;
 	public var objectGroups:TmxOrderedHash<TmxObjectGroup>;
+	public static var patternsPath:String = "maps/";
 
 	public function new(data:MapData)
 	{
@@ -102,7 +103,7 @@ class TmxMap
 		for (node in source.nodes.objectgroup)
 			objectGroups.set(node.att.name, new TmxObjectGroup(node, this));
 
-		// for (node in source.nodes.imagelayer)
+		//for (node in source.nodes.imagelayer)
 		// 	imageLayers.set(node.att.name, new TmxImageLayer(node));
 	}
 
@@ -133,7 +134,7 @@ class TmxMap
 		}
 		return null;
 	}
-	
+
 	public function getGidProperty(gid:Int, property:String)
 	{
 		var last:TmxTileSet = null;

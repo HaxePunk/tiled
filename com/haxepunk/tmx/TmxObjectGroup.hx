@@ -18,26 +18,26 @@ class TmxObjectGroup
 	public var visible:Bool;
 	public var properties:TmxPropertySet;
 	public var objects:Array<TmxObject>;
-	
+
 	public function new(source:Fast, parent:TmxMap)
 	{
 		properties = new TmxPropertySet();
 		objects = new Array<TmxObject>();
-		
+
 		map = parent;
 		name = source.att.name;
 		x = (source.has.x) ? Std.parseInt(source.att.x) : 0;
 		y = (source.has.y) ? Std.parseInt(source.att.y) : 0;
-		width = Std.parseInt(source.att.width);
-		height = Std.parseInt(source.att.height);
+		width = source.has.width ? Std.parseInt(source.att.width) : 1;
+		height = source.has.height ? Std.parseInt(source.att.height) : 1;
 		visible = (source.has.visible && source.att.visible == "1") ? true : false;
 		opacity = (source.has.opacity) ? Std.parseFloat(source.att.opacity) : 0;
-		
+
 		//load properties
 		var node:Fast;
 		for (node in source.nodes.properties)
 			properties.extend(node);
-			
+
 		//load objects
 		for (node in source.nodes.object)
 			objects.push(new TmxObject(node, this));

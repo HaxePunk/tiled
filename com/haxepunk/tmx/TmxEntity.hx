@@ -10,19 +10,19 @@ import com.haxepunk.masks.SlopedGrid;
 import com.haxepunk.masks.Masklist;
 import com.haxepunk.tmx.TmxMap;
 
-private abstract Map(TmxMap)
+private abstract TmxMapData(TmxMap)
 {
 	private inline function new(map:TmxMap) this = map;
 	@:to public inline function toMap():TmxMap return this;
 
 	@:from public static inline function fromString(s:String)
-		return new Map(new TmxMap(Xml.parse(openfl.Assets.getText(s))));
+		return new TmxMapData(new TmxMap(Xml.parse(openfl.Assets.getText(s))));
 
 	@:from public static inline function fromTmxMap(map:TmxMap)
-		return new Map(map);
+		return new TmxMapData(map);
 
 	@:from public static inline function fromMapData(mapData:MapData)
-		return new Map(new TmxMap(mapData));
+		return new TmxMapData(new TmxMap(mapData));
 }
 
 class TmxEntity extends Entity
@@ -31,7 +31,7 @@ class TmxEntity extends Entity
 	public var map:TmxMap;
 	public var debugObjectMask:Bool;
 
-	public function new(mapData:Map)
+	public function new(mapData:TmxMapData)
 	{
 		super();
 
@@ -123,7 +123,7 @@ class TmxEntity extends Entity
 		setHitbox(grid.width, grid.height);
 		return tileCoords;
 	}
-	
+
 	public function loadSlopedMask(collideLayer:String = "collide", typeName:String = "solid", skip:Array<Int> = null)
 	{
 		if (!map.layers.exists(collideLayer))
@@ -133,12 +133,12 @@ class TmxEntity extends Entity
 #end
 			return;
 		}
-		
+
 		var gid:Int;
 		var layer:TmxLayer = map.layers.get(collideLayer);
 		var grid = new SlopedGrid(map.fullWidth, map.fullHeight, map.tileWidth, map.tileHeight);
 		var types = Type.getEnumConstructs(TileType);
-		
+
 		for (row in 0...layer.height)
 		{
 			for (col in 0...layer.width)
@@ -170,7 +170,7 @@ class TmxEntity extends Entity
 				}
 			}
 		}
-		
+
 		this.mask = grid;
 		this.type = typeName;
 		setHitbox(grid.width, grid.height);

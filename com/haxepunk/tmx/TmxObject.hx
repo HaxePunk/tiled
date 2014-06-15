@@ -4,6 +4,13 @@
  * For questions mail me at heardtheword@gmail.com
  ******************************************************************************/
 package com.haxepunk.tmx;
+import com.haxepunk.Graphic;
+import com.haxepunk.graphics.atlas.Atlas;
+import com.haxepunk.graphics.Image;
+import com.haxepunk.masks.Polygon;
+import flash.display.BitmapData;
+import flash.geom.Matrix;
+import flash.geom.Point;
 import haxe.xml.Fast;
 import com.haxepunk.masks.Hitbox;
 
@@ -65,6 +72,36 @@ class TmxObject
 			debug_graphic.x = x;
 			debug_graphic.y = y;
 #end
+		}else if (source.hasNode.polygon) {
+			var polygon_node:Fast = source.node.polygon;
+						
+			var pointsString:String = polygon_node.att.points;
+			var pairStrings:Array<String> = pointsString.split(' ');
+			
+			var maskPoints:Array<Point> = new Array<Point>();
+			
+			for (pair in pairStrings)
+			{
+				var pointStrings:Array<String> = pair.split(',');
+				maskPoints.push(new Point(Std.parseFloat(pointStrings[0]), Std.parseFloat(pointStrings[1])));
+			}
+			
+			shapeMask = new Polygon(maskPoints);
+
+#if debug
+			var graphicPoints:flash.Vector<Float> = new flash.Vector<Float>();
+			
+			for (point in maskPoints)
+			{
+				graphicPoints.push(point.x);
+				graphicPoints.push(point.y);
+			}
+			
+			debug_graphic = createPolygon(graphicPoints);
+			
+			debug_graphic.x += x;
+			debug_graphic.y += y;
+#end
 		}else{ // rect
 			shapeMask = new com.haxepunk.masks.Hitbox(width, height, x, y);
 
@@ -74,5 +111,56 @@ class TmxObject
 			debug_graphic.y = y;
 #end
 		}
+	}
+	
+	function createPolygon(points:flash.Vector<Float>)
+	{	
+		//Find limits for image
+		var minX:Float = 0, maxX:Float = 0, minY:Float = 0, maxY:Float = 0;
+		for (i in 0 ... Std.int(points.length / 2))
+		{
+			var x:Float = points[i * 2];
+			var y:Float = points[(i * 2) + 1];
+			
+			if (x < minX) { minX = x; }
+			if (x > maxX) { maxX = x; }
+			if (y < minY) { minY = y; }
+			if (y > maxY) { maxY = y; }
+		}
+		
+		var commands:flash.Vector<Int> = new flash.Vector<Int>();
+		
+		commands.push(1); //Move to
+		for (i in 0 ... Std.int(points.length / 2))
+		{
+			commands.push(2); //Line to
+		}
+		
+		HXP.sprite.graphics.clear();
+
+		HXP.sprite.graphics.beginFill(0xFFFFFF);
+		HXP.sprite.graphics.drawPath(commands, points);
+		
+		var data:BitmapData = HXP.createBitmap(Std.int(maxX - minX), Std.int(maxY - minY), true, 0);
+		var transform:Matrix = new Matrix( 1, 0, 0, 1, -minX, -minY );
+		data.draw(HXP.sprite, transform);
+		
+		var image:Image;
+		if (HXP.renderMode == RenderMode.HARDWARE)
+		{
+			image = new Image(Atlas.loadImageAsRegion(data));
+		}
+		else
+		{
+			image = new Image(data);
+		}
+
+		image.color = 0xff0000;
+		image.alpha = 0.6;
+		
+		image.x = minX;
+		image.y = minY;
+
+		return image;
 	}
 }

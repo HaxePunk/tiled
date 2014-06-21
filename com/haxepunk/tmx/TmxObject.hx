@@ -87,6 +87,8 @@ class TmxObject
 			}
 			
 			shapeMask = new Polygon(maskPoints);
+			shapeMask.x = x;
+			shapeMask.y = y;
 
 #if debug
 			var graphicPoints:flash.Vector<Float> = new flash.Vector<Float>();

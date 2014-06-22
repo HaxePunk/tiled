@@ -130,6 +130,10 @@ class TmxObject
 			if (y > maxY) { maxY = y; }
 		}
 		
+		//Make it join back to the first point, otherwise it'll default to 0,0
+		points.push(points[0]);
+		points.push(points[1]);
+		
 		var commands:flash.Vector<Int> = new flash.Vector<Int>();
 		
 		commands.push(1); //Move to
@@ -137,6 +141,7 @@ class TmxObject
 		{
 			commands.push(2); //Line to
 		}
+		
 		
 		HXP.sprite.graphics.clear();
 

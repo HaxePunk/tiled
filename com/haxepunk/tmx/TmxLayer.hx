@@ -22,7 +22,7 @@ class TmxLayer
 	public var visible:Bool;
 	public var tileGIDs:Array<Array<Int>>;
 	public var properties:TmxPropertySet;
-	
+
 	public function new(source:Fast, parent:TmxMap)
 	{
 		properties = new TmxPropertySet();
@@ -30,16 +30,16 @@ class TmxLayer
 		name = source.att.name;
 		x = (source.has.x) ? Std.parseInt(source.att.x) : 0;
 		y = (source.has.y) ? Std.parseInt(source.att.y) : 0;
-		width = Std.parseInt(source.att.width); 
-		height = Std.parseInt(source.att.height); 
-		visible = (source.has.visible && source.att.visible == "1") ? true : false;
+		width = Std.parseInt(source.att.width);
+		height = Std.parseInt(source.att.height);
+		visible = (source.has.visible && source.att.visible == "1") || !source.has.visible ? true : false;
 		opacity = (source.has.opacity) ? Std.parseFloat(source.att.opacity) : 0;
-		
+
 		//load properties
 		var node:Fast;
 		for (node in source.nodes.properties)
 			properties.extend(node);
-		
+
 		//load tile GIDs
 		tileGIDs = [];
 		var data:Fast = source.node.data;
@@ -87,7 +87,7 @@ class TmxLayer
 			}
 		}
 	}
-	
+
 	public function toCsv(tileSet:TmxTileSet = null):String
 	{
 		var max:Int = 0xFFFFFF;
@@ -113,7 +113,7 @@ class TmxLayer
 		}
 		return result;
 	}
-	
+
 	/* ONE DIMENSION ARRAY
 	public static function arrayToCSV(input:Array, lineWidth:Int):String
 	{
@@ -131,7 +131,7 @@ class TmxLayer
 		return result;
 	}
 	*/
-	
+
 	private static function csvToArray(input:String):Array<Array<Int>>
 	{
 		var result:Array<Array<Int>> = new Array<Array<Int>>();
@@ -149,7 +149,7 @@ class TmxLayer
 		}
 		return result;
 	}
-	
+
 	private static function base64ToArray(chunk:String, lineWidth:Int, compressed:Bool):Array<Array<Int>>
 	{
 		var result:Array<Array<Int>> = new Array<Array<Int>>();
@@ -158,11 +158,11 @@ class TmxLayer
 		{
 			#if (js && !format)
 			throw "Need the format library to use compressed map on html5";
-			#else 
+			#else
 			data.uncompress();
 			#end
 		}
-			
+
 		data.endian = Endian.LITTLE_ENDIAN;
 		while(data.position < data.length)
 		{
@@ -174,10 +174,10 @@ class TmxLayer
 		}
 		return result;
 	}
-	
+
 	private static inline var BASE64_CHARS:String = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
-	
-	private static function base64ToByteArray(data:String):ByteArray 
+
+	private static function base64ToByteArray(data:String):ByteArray
 	{
 		var output:ByteArray = new ByteArray();
 		//initialize lookup table
@@ -187,22 +187,22 @@ class TmxLayer
 		{
 			lookup[BASE64_CHARS.charCodeAt(c)] = c;
 		}
-		
+
 		var i:Int = 0;
-		while (i < data.length - 3) 
+		while (i < data.length - 3)
 		{
 			// Ignore whitespace
 			if (data.charAt(i) == " " || data.charAt(i) == "\n")
 			{
 				i++; continue;
 			}
-			
+
 			//read 4 bytes and look them up in the table
 			var a0:Int = lookup[data.charCodeAt(i)];
 			var a1:Int = lookup[data.charCodeAt(i + 1)];
 			var a2:Int = lookup[data.charCodeAt(i + 2)];
 			var a3:Int = lookup[data.charCodeAt(i + 3)];
-			
+
 			// convert to and write 3 bytes
 			if(a1 < 64)
 				output.writeByte((a0 << 2) + ((a1 & 0x30) >> 4));
@@ -210,10 +210,10 @@ class TmxLayer
 				output.writeByte(((a1 & 0x0f) << 4) + ((a2 & 0x3c) >> 2));
 			if(a3 < 64)
 				output.writeByte(((a2 & 0x03) << 6) + a3);
-			
+
 			i += 4;
 		}
-		
+
 		// Rewind & return decoded data
 		output.position = 0;
 		return output;

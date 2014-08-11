@@ -8,9 +8,9 @@ import com.haxepunk.Graphic;
 import com.haxepunk.graphics.atlas.Atlas;
 import com.haxepunk.graphics.Image;
 import com.haxepunk.masks.Polygon;
+import com.haxepunk.math.Vector;
 import flash.display.BitmapData;
 import flash.geom.Matrix;
-import flash.geom.Point;
 import haxe.xml.Fast;
 import com.haxepunk.masks.Hitbox;
 
@@ -78,12 +78,12 @@ class TmxObject
 			var pointsString:String = polygon_node.att.points;
 			var pairStrings:Array<String> = pointsString.split(' ');
 			
-			var maskPoints:Array<Point> = new Array<Point>();
+			var maskPoints:Array<Vector> = new Array<Vector>();
 			
 			for (pair in pairStrings)
 			{
 				var pointStrings:Array<String> = pair.split(',');
-				maskPoints.push(new Point(Std.parseFloat(pointStrings[0]), Std.parseFloat(pointStrings[1])));
+				maskPoints.push(new Vector(Std.parseFloat(pointStrings[0]), Std.parseFloat(pointStrings[1])));
 			}
 			
 			shapeMask = new Polygon(maskPoints);
@@ -91,7 +91,7 @@ class TmxObject
 			shapeMask.y = y;
 
 #if debug
-			var graphicPoints:flash.Vector<Float> = new flash.Vector<Float>();
+			var graphicPoints:Array<Float> = new Array<Float>();
 			
 			for (point in maskPoints)
 			{
@@ -115,7 +115,7 @@ class TmxObject
 		}
 	}
 	
-	function createPolygon(points:flash.Vector<Float>)
+	function createPolygon(points:Array<Float>)
 	{	
 		//Find limits for image
 		var minX:Float = 0, maxX:Float = 0, minY:Float = 0, maxY:Float = 0;

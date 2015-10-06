@@ -1,5 +1,13 @@
 # HaxePunk Tiled
 
+## Add the HaxePunk Tiled library to your game
+
+You need to add
+
+	<haxelib name="HaxePunkTmx" />
+
+to your `project.xml` file.
+
 ## Add your maps to project.xml
 	
 	<assets path="assets/maps" rename="maps" include="*.tmx" />

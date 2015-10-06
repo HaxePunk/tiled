@@ -61,7 +61,7 @@ class TmxObject
 			shapeMask = new com.haxepunk.masks.Circle(radius, x, y);
 
 #if debug
-			debug_graphic = com.haxepunk.graphics.Image.createCircle(radius, 0xff0000, .6);
+			debug_graphic = com.haxepunk.graphics.Image.createCircle((radius>0)?radius:1, 0xff0000, .6);
 			debug_graphic.x = x;
 			debug_graphic.y = y;
 #end
@@ -69,7 +69,7 @@ class TmxObject
 			shapeMask = new com.haxepunk.masks.Hitbox(width, height, x, y);
 
 #if debug
-			debug_graphic = com.haxepunk.graphics.Image.createRect(width, height, 0xff0000, .6);
+			debug_graphic = com.haxepunk.graphics.Image.createRect((width>0)?width:1, (height>0)?height:1, 0xff0000, .6);
 			debug_graphic.x = x;
 			debug_graphic.y = y;
 #end

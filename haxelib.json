@@ -4,7 +4,7 @@
 	"license": "MIT",
 	"tags": ["game", "haxepunk"],
 	"description": "Tiled TMX loader for HaxePunk",
-	"version": "1.0.3",
-	"releasenote": "Updated for HaxePunk 2.5.3",
+	"version": "1.0.4",
+	"releasenote": "Bug fix",
 	"contributors": ["heardtheword", "_ibilon"]
 }

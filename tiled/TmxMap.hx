@@ -1,8 +1,12 @@
 package tiled;
 
 import haxe.xml.Fast;
+
+#if openfl
 import openfl.Assets;
-import openfl.utils.ByteArray;
+#elseif nme
+import nme.Assets;
+#end
 
 abstract MapData(Fast)
 {
@@ -49,7 +53,7 @@ abstract TmxMapStaggerAxis(String) to String
 }
 
 @:enum
-abstract TmxMapStaggerAxis(String) to String
+abstract TmxMapStaggerIndex(String) to String
 {
 	var EVEN = "even";
 	var ODD = "odd";
@@ -73,7 +77,7 @@ class TmxMap
 	public var tileWidth(default, null):Int;
 	/** The height of a tile. */
 	public var tileHeight(default, null):Int;
-	/** For staggered and hexagonal maps, determines which axis ("x" or "y") is staggered. */
+	/** For staggered and hexagonal maps, determines which axis is staggered. */
 	public var staggerAxis(default, null):TmxMapStaggerAxis;
 	/** For staggered and hexagonal maps, determines whether the "even" or "odd" indexes along the staggered axis are shifted. */
 	public var staggerIndex(default, null):TmxMapStaggerIndex;
@@ -84,7 +88,7 @@ class TmxMap
 
 	// Map content
 	/** The custom properties of the map. */
-	public var properties(default, null):Array<TmxProperty>;
+	public var properties(default, null):Map<String, String>;
 	/** The tilesets of the map. */
 	public var tilesets(default, null):Array<TmxTileset>;
 	/** The layers can be a combinaison of tile layers, object groups or image layers. */
@@ -102,9 +106,17 @@ class TmxMap
 	/** Subset of only the image layers. */
 	public var imageLayers(default, null):Array<TmxImageLayer>;
 
+#if (openfl || nme)
+	/** Loads map from asset name. */
+	public static function loadFromAsset(name:String):TmxMap
+	{
+		return new TmxMap(Assets.getText(name));
+	}
+#end
+
 	public function new(data:MapData)
 	{
-		properties = new Array<TmxProperty>();
+		properties = new Map<String, String>();
 		tilesets = new Array<TmxTileset>();
 		layers = new Array<TmxLayer>();
 		tileLayers = new Array<TmxTileLayer>();
@@ -179,114 +191,37 @@ class TmxMap
 		fullWidth = width * tileWidth;
 		fullHeight = height * tileHeight;
 
-		// Read properties
-		for (node in source.nodes.properties)
+		// Load data
+		for (node in source.elements)
 		{
-			properties.push(new TmxProperty(node));
-		}
-
-		// Load tilesets
-		for (node in source.nodes.tileset)
-		{
-			tilesets.push(new TmxTileset(node));
-		}
-
-		// Load layers
-		/*
-		for (node in source.nodes.layer)
-		{
-			layers.set(node.att.name, new TmxLayer(node, this));
-		}
-
-		// Load image layer
-		for (node in source.nodes.imagelayer)
-		{
-			for (img in node.nodes.image)
+			switch (node.name)
 			{
-				imageLayers.set(node.att.name, img.att.source.substr(3));
+				case "properties":
+					for (property in node.nodes.property)
+					{
+						properties.set(property.att.name, property.att.value);
+					}
+
+				case "tileset":
+					tilesets.push(new TmxTileset(node, this));
+
+				case "layer": // Tile layer
+					var layer = new TmxTileLayer(node, this);
+					layers.push(layer);
+					tileLayers.push(layer);
+
+				case "objectgroup":
+					var layer = new TmxObjectGroup(node, this);
+					layers.push(layer);
+					objectGroups.push(layer);
+
+				case "imagelayer":
+					var layer = new TmxImageLayer(node, this);
+					layers.push(layer);
+					imageLayers.push(layer);
+
+				default:
 			}
 		}
-
-		// Load object group
-		for (node in source.nodes.objectgroup)
-		{
-			objectGroups.set(node.att.name, new TmxObjectGroup(node, this));
-		}
-
-		// for (node in source.nodes.imagelayer)
-		// 	imageLayers.set(node.att.name, new TmxImageLayer(node));
-		*/
-	}
-
-	public static function loadFromFile(name:String):TmxMap
-	{
-		return new TmxMap(Assets.getText(name));
-	}
-
-	public function getLayer(name:String):TmxLayer
-	{
-		return layers.get(name);
-	}
-
-	public function getObjectGroup(name:String):TmxObjectGroup
-	{
-		return objectGroups.get(name);
-	}
-
-	// Works only after TmxTileSet has been initialized with an image...
-	public function getGidOwner(gid:Int):TmxTileSet
-	{
-		var last:TmxTileSet = null;
-		var set:TmxTileSet;
-
-		for (set in tilesets)
-		{
-			if (set.hasGid(gid))
-			{
-				return set;
-			}
-		}
-
-		return null;
-	}
-
-	public function getGidProperty(gid:Int, property:String)
-	{
-		var last:TmxTileSet = null;
-		var set:TmxTileSet;
-
-		for (set in tilesets)
-		{
-			if (set.hasGid(gid) && set.getPropertiesByGid(gid) != null)
-			{
-				return set.getPropertiesByGid(gid).resolve(property);
-			}
-		}
-
-		return null;
-	}
-
-	public function getTileMapSpacing(name:String):Int
-	{
-		var index = -1;
-		var i = 0;
-
-		for (key in layers.keys())
-		{
-			if (key == name)
-			{
-				index = i;
-				break;
-			}
-		}
-
-		i++;
-
-		if (index == -1)
-		{
-			return 0;
-		}
-
-		return tilesets[index].spacing;
 	}
 }

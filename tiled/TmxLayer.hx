@@ -3,7 +3,7 @@
  * This content is released under the MIT License.
  * For questions mail me at heardtheword@gmail.com
  ******************************************************************************/
-package com.haxepunk.tmx;
+package tiled;
 
 import flash.utils.ByteArray;
 import flash.utils.Endian;

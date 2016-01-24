@@ -8,7 +8,8 @@ import com.haxepunk.graphics.Tilemap;
 import com.haxepunk.masks.Grid;
 import com.haxepunk.masks.SlopedGrid;
 import com.haxepunk.masks.Masklist;
-import com.haxepunk.tmx.TmxMap;
+import tiled.*;
+import tiled.TmxMap.MapData;
 
 private abstract Map(TmxMap)
 {

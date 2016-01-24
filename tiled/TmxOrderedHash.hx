@@ -1,4 +1,4 @@
-package com.haxepunk.tmx;
+package tiled;
 
 class TmxOrderedHash<T>
 {

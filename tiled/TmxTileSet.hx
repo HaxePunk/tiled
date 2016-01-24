@@ -1,24 +1,23 @@
-/*******************************************************************************
- * Copyright (c) 2011 by Matt Tuttle (original by Thomas Jahn)
- * This content is released under the MIT License.
- * For questions mail me at heardtheword@gmail.com
- ******************************************************************************/
 package tiled;
 
-import flash.display.BitmapData;
-import flash.geom.Rectangle;
-import flash.utils.ByteArray;
 import haxe.xml.Fast;
+import openfl.display.BitmapData;
+import openfl.geom.Rectangle;
+import openfl.utils.ByteArray;
 
 abstract TileSetData(Fast)
 {
-	private inline function new(f:Fast) this = f;
-	@:to public inline function toMap():Fast return this;
+	private inline function new(f:Fast)
+		this = f;
+
+	@:to public inline function toMap():Fast
+		return this;
 
 	@:from public static inline function fromFast(f:Fast)
 		return new TileSetData(f);
 
-	@:from public static inline function fromByteArray(ba:ByteArray) {
+	@:from public static inline function fromByteArray(ba:ByteArray)
+	{
 		var f = new Fast(Xml.parse(ba.toString()));
 		return new TileSetData(f.node.tileset);
 	}
@@ -37,7 +36,7 @@ class TmxTileSet
 	public var margin:Int=0;
 	public var imageSource:String;
 
-	//available only after image has been assigned:
+	// Available only after image has been assigned:
 	public var numTiles:Int;
 	public var numRows:Int;
 	public var numCols:Int;
@@ -52,12 +51,12 @@ class TmxTileSet
 
 		firstGID = (source.has.firstgid) ? Std.parseInt(source.att.firstgid) : 1;
 
-		// check for external source
+		// Check for external source
 		if (source.has.source)
 		{
-
+			//TODO
 		}
-		else // internal
+		else // Internal
 		{
 			var node:Fast = source.node.image;
 			imageSource = node.att.source;
@@ -70,14 +69,18 @@ class TmxTileSet
 
 			//read properties
 			_tileProps = new Array<TmxPropertySet>();
+
 			for (node in source.nodes.tile)
 			{
 				if (node.has.id)
 				{
 					var id:Int = Std.parseInt(node.att.id);
 					_tileProps[id] = new TmxPropertySet();
+
 					for (prop in node.nodes.properties)
+					{
 						_tileProps[id].extend(prop);
+					}
 				}
 			}
 		}
@@ -91,10 +94,12 @@ class TmxTileSet
 	public function set_image(v:BitmapData):BitmapData
 	{
 		_image = v;
+
 		//TODO: consider spacing & margin
 		numCols = Math.floor(v.width / tileWidth);
 		numRows = Math.floor(v.height / tileHeight);
 		numTiles = numRows * numCols;
+
 		return _image;
 	}
 
@@ -116,7 +121,10 @@ class TmxTileSet
 	public function getPropertiesByGid(gid:Int):TmxPropertySet
 	{
 		if (_tileProps != null)
+		{
 			return _tileProps[gid - firstGID];
+		}
+
 		return null;
 	}
 

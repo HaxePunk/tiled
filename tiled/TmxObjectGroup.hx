@@ -1,11 +1,7 @@
-/*******************************************************************************
- * Copyright (c) 2011 by Matt Tuttle (original by Thomas Jahn)
- * This content is released under the MIT License.
- * For questions mail me at heardtheword@gmail.com
- ******************************************************************************/
 package tiled;
-import haxe.xml.Fast;
+
 import com.haxepunk.tmx.TmxObject;
+import haxe.xml.Fast;
 
 class TmxObjectGroup
 {
@@ -19,12 +15,12 @@ class TmxObjectGroup
 	public var visible:Bool;
 	public var properties:TmxPropertySet;
 	public var objects:Array<TmxObject>;
-	
+
 	public function new(source:Fast, parent:TmxMap)
 	{
 		properties = new TmxPropertySet();
 		objects = new Array<TmxObject>();
-		
+
 		map = parent;
 		name = source.att.name;
 		x = (source.has.x) ? Std.parseInt(source.att.x) : 0;
@@ -33,14 +29,18 @@ class TmxObjectGroup
 		height = map.height;
 		visible = (source.has.visible && source.att.visible == "1") ? true : false;
 		opacity = (source.has.opacity) ? Std.parseFloat(source.att.opacity) : 0;
-		
-		//load properties
+
+		// Load properties
 		var node:Fast;
 		for (node in source.nodes.properties)
+		{
 			properties.extend(node);
-			
-		//load objects
+		}
+
+		// Load objects
 		for (node in source.nodes.object)
+		{
 			objects.push(new TmxObject(node, this));
+		}
 	}
 }

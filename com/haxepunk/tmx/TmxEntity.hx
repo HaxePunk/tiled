@@ -13,8 +13,11 @@ import tiled.TmxMap.MapData;
 
 private abstract Map(TmxMap)
 {
-	private inline function new(map:TmxMap) this = map;
-	@:to public inline function toMap():TmxMap return this;
+	private inline function new(map:TmxMap)
+		this = map;
+
+	@:to public inline function toMap():TmxMap
+		return this;
 
 	@:from public static inline function fromString(s:String)
 		return new Map(new TmxMap(Xml.parse(openfl.Assets.getText(s))));
@@ -28,7 +31,6 @@ private abstract Map(TmxMap)
 
 class TmxEntity extends Entity
 {
-
 	public var map:TmxMap;
 	public var debugObjectMask:Bool;
 
@@ -67,6 +69,7 @@ class TmxEntity extends Entity
 #end
 				continue;
 			}
+
 			layer = map.layers.get(name);
 			var spacing = map.getTileMapSpacing(name);
 
@@ -79,12 +82,14 @@ class TmxEntity extends Entity
 				{
 					gid = layer.tileGIDs[row][col] - 1;
 					if (gid < 0) continue;
+
 					if (skip == null || Lambda.has(skip, gid) == false)
 					{
 						tilemap.setTile(col, row, gid);
 					}
 				}
 			}
+
 			addGraphic(tilemap);
 		}
 	}
@@ -92,6 +97,7 @@ class TmxEntity extends Entity
 	public function loadMask(collideLayer:String = "collide", typeName:String = "solid", skip:Array<Int> = null)
 	{
 		var tileCoords:Array<TmxVec4> = new Array<TmxVec4>();
+
 		if (!map.layers.exists(collideLayer))
 		{
 #if debug
@@ -111,6 +117,7 @@ class TmxEntity extends Entity
 			{
 				gid = layer.tileGIDs[row][col] - 1;
 				if (gid < 0) continue;
+
 				if (skip == null || Lambda.has(skip, gid) == false)
 				{
 					grid.setTile(col, row, true);
@@ -122,9 +129,10 @@ class TmxEntity extends Entity
 		this.mask = grid;
 		this.type = typeName;
 		setHitbox(grid.width, grid.height);
+
 		return tileCoords;
 	}
-	
+
 	public function loadSlopedMask(collideLayer:String = "collide", typeName:String = "solid", skip:Array<Int> = null)
 	{
 		if (!map.layers.exists(collideLayer))
@@ -134,26 +142,29 @@ class TmxEntity extends Entity
 #end
 			return;
 		}
-		
+
 		var gid:Int;
 		var layer:TmxLayer = map.layers.get(collideLayer);
 		var grid = new SlopedGrid(map.fullWidth, map.fullHeight, map.tileWidth, map.tileHeight);
 		var types = Type.getEnumConstructs(TileType);
-		
+
 		for (row in 0...layer.height)
 		{
 			for (col in 0...layer.width)
 			{
 				gid = layer.tileGIDs[row][col] - 1;
 				if (gid < 0) continue;
+
 				if (skip == null || Lambda.has(skip, gid) == false)
 				{
 					var type = map.getGidProperty(gid + 1, "tileType");
+
 					// collideType is null, load as solid tile
 					if (type == null)
+					{
 						grid.setTile(col, row, Solid);
-					// load as custom collide type tile
-					else
+					}
+					else // load as custom collide type tile
 					{
 						for(i in 0...types.length)
 						{
@@ -171,7 +182,7 @@ class TmxEntity extends Entity
 				}
 			}
 		}
-		
+
 		this.mask = grid;
 		this.type = typeName;
 		setHitbox(grid.width, grid.height);
@@ -200,7 +211,8 @@ class TmxEntity extends Entity
 #end
 
 		// Loop through objects
-		for(object in objectGroup.objects){ // :TmxObject
+		for (object in objectGroup.objects) // :TmxObject
+		{
 			masks_ar.push(object.shapeMask);
 #if debug
 			debug_graphics_ar.push(object.debug_graphic);
@@ -208,7 +220,8 @@ class TmxEntity extends Entity
 		}
 
 #if debug
-		if(debugObjectMask){
+		if (debugObjectMask)
+		{
 			var debug_graphicList = new Graphiclist(debug_graphics_ar);
 			this.addGraphic(debug_graphicList);
 		}
@@ -217,7 +230,5 @@ class TmxEntity extends Entity
 		var maskList = new Masklist(masks_ar);
 		this.mask = maskList;
 		this.type = typeName;
-
 	}
-
 }

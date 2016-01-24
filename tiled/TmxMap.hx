@@ -1,23 +1,16 @@
-/*******************************************************************************
- * Copyright (c) 2011 by Matt Tuttle (original by Thomas Jahn)
- * This content is released under the MIT License.
- * For questions mail me at heardtheword@gmail.com
- ******************************************************************************/
 package tiled;
 
 import haxe.xml.Fast;
-import flash.utils.ByteArray;
-
-#if nme
-import nme.Assets;
-#else
 import openfl.Assets;
-#end
+import openfl.utils.ByteArray;
 
 abstract MapData(Fast)
 {
-	private inline function new(f:Fast) this = f;
-	@:to public inline function toMap():Fast return this;
+	private inline function new(f:Fast)
+		this = f;
+
+	@:to public inline function toMap():Fast
+		return this;
 
 	@:from public static inline function fromString(s:String)
 		return new MapData(new Fast(Xml.parse(s)));
@@ -64,32 +57,45 @@ class TmxMap
 
 		//map header
 		version = source.att.version;
-		if (version == null) version = "unknown";
+		if (version == null)
+		{
+			version = "unknown";
+		}
 
 		orientation = source.att.orientation;
-		if (orientation == null) orientation = "orthogonal";
+		if (orientation == null)
+		{
+			orientation = "orthogonal";
+		}
 
 		width = Std.parseInt(source.att.width);
 		height = Std.parseInt(source.att.height);
 		tileWidth = Std.parseInt(source.att.tilewidth);
 		tileHeight = Std.parseInt(source.att.tileheight);
+
 		// Calculate the entire size
 		fullWidth = width * tileWidth;
 		fullHeight = height * tileHeight;
 
-		//read properties
+		// Read properties
 		for (node in source.nodes.properties)
+		{
 			properties.extend(node);
+		}
 
-		//load tilesets
+		// Load tilesets
 		for (node in source.nodes.tileset)
+		{
 			tilesets.push(new TmxTileSet(node));
+		}
 
-		//load layer
+		// Load layer
 		for (node in source.nodes.layer)
+		{
 			layers.set(node.att.name, new TmxLayer(node, this));
+		}
 
-		//load image layer
+		// Load image layer
 		for (node in source.nodes.imagelayer)
 		{
 			for (img in node.nodes.image)
@@ -98,9 +104,11 @@ class TmxMap
 			}
 		}
 
-		//load object group
+		// Load object group
 		for (node in source.nodes.objectgroup)
+		{
 			objectGroups.set(node.att.name, new TmxObjectGroup(node, this));
+		}
 
 		// for (node in source.nodes.imagelayer)
 		// 	imageLayers.set(node.att.name, new TmxImageLayer(node));
@@ -121,28 +129,36 @@ class TmxMap
 		return objectGroups.get(name);
 	}
 
-	//works only after TmxTileSet has been initialized with an image...
+	// Works only after TmxTileSet has been initialized with an image...
 	public function getGidOwner(gid:Int):TmxTileSet
 	{
 		var last:TmxTileSet = null;
 		var set:TmxTileSet;
+
 		for (set in tilesets)
 		{
-			if(set.hasGid(gid))
+			if (set.hasGid(gid))
+			{
 				return set;
+			}
 		}
+
 		return null;
 	}
-	
+
 	public function getGidProperty(gid:Int, property:String)
 	{
 		var last:TmxTileSet = null;
 		var set:TmxTileSet;
+
 		for (set in tilesets)
 		{
-			if(set.hasGid(gid) && set.getPropertiesByGid(gid) != null)
+			if (set.hasGid(gid) && set.getPropertiesByGid(gid) != null)
+			{
 				return set.getPropertiesByGid(gid).resolve(property);
+			}
 		}
+
 		return null;
 	}
 
@@ -150,16 +166,23 @@ class TmxMap
 	{
 		var index = -1;
 		var i = 0;
+
 		for (key in layers.keys())
+		{
 			if (key == name)
 			{
 				index = i;
 				break;
 			}
-			i++;
+		}
+
+		i++;
 
 		if (index == -1)
+		{
 			return 0;
+		}
+
 		return tilesets[index].spacing;
 	}
 }

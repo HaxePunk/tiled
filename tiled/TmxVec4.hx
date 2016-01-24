@@ -14,5 +14,4 @@ class TmxVec4
 		this.width = width;
 		this.height = height;
 	}
-
 }

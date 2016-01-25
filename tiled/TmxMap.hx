@@ -1,5 +1,6 @@
 package tiled;
 
+import haxe.io.Bytes;
 import haxe.xml.Fast;
 
 #if openfl
@@ -8,13 +9,10 @@ import openfl.Assets;
 import nme.Assets;
 #end
 
-abstract MapData(Fast)
+abstract MapData(Fast) to Fast
 {
 	private inline function new(f:Fast)
 		this = f;
-
-	@:to public inline function toMap():Fast
-		return this;
 
 	@:from public static inline function fromString(s:String)
 		return new MapData(new Fast(Xml.parse(s)));
@@ -22,8 +20,8 @@ abstract MapData(Fast)
 	@:from public static inline function fromXml(xml:Xml)
 		return new MapData(new Fast(xml));
 
-	@:from public static inline function fromByteArray(ba:ByteArray)
-		return new MapData(new Fast(Xml.parse(ba.toString())));
+	@:from public static inline function fromByteArray(b:Bytes)
+		return new MapData(new Fast(Xml.parse(b.toString())));
 }
 
 @:enum
@@ -127,15 +125,15 @@ class TmxMap
 
 		// Populate the map informations
 		version = source.att.version;
-		if (version == null) throw TmxError.MISSING_VERSION;
+		if (version == null) throw TmxError.MISSING_MAP_VERSION;
 
 		orientation = switch (source.att.orientation) {
 			case "orthogonal": ORTHOGONAL;
 			case "isometric": ISOMETRIC;
 			case "staggered": STAGGERED;
 			case "hexagonal": HEXGONAL;
-			case null: throw TmxError.MISSING_ORIENTATION;
-			default: throw TmxError.INVALID_ORIENTATION;
+			case null: throw TmxError.MISSING_MAP_ORIENTATION;
+			default: throw TmxError.INVALID_MAP_ORIENTATION;
 		};
 
 		renderOrder = switch (source.att.renderorder) {
@@ -143,36 +141,36 @@ class TmxMap
 			case "right-up": RIGHT_UP;
 			case "left-down": LEFT_DOWN;
 			case "left-up": LEFT_UP;
-			case null: throw TmxError.MISSING_RENDERORDER;
-			default: throw TmxError.INVALID_RENDERORDER;
+			case null: throw TmxError.MISSING_MAP_RENDERORDER;
+			default: throw TmxError.INVALID_MAP_RENDERORDER;
 		};
 
 		width = Std.parseInt(source.att.width);
-		if (width == null) throw TmxError.INVALID_WIDTH;
+		if (width == null) throw TmxError.INVALID_MAP_WIDTH;
 
 		height = Std.parseInt(source.att.height);
-		if (height == null) throw TmxError.INVALID_HEIGHT;
+		if (height == null) throw TmxError.INVALID_MAP_HEIGHT;
 
 		tileWidth = Std.parseInt(source.att.tilewidth);
-		if (tileWidth == null) throw TmxError.INVALID_TILEWIDTH;
+		if (tileWidth == null) throw TmxError.INVALID_MAP_TILEWIDTH;
 
 		tileHeight = Std.parseInt(source.att.tileheight);
-		if (tileHeight == null) throw TmxError.INVALID_TILEHEIGHT;
+		if (tileHeight == null) throw TmxError.INVALID_MAP_TILEHEIGHT;
 
 		if (orientation == STAGGERED || orientation == HEXAGONAL)
 		{
 			staggerAxis = switch (source.att.staggeraxis) {
 				case "x": X;
 				case "y": Y;
-				case null: throw TmxError.MISSING_STAGGERAXIS;
-				default: throw TmxError.INVALID_STAGGERAXIS;
+				case null: throw TmxError.MISSING_MAP_STAGGERAXIS;
+				default: throw TmxError.INVALID_MAP_STAGGERAXIS;
 			};
 
 			staggerIndex = switch (source.att.staggerindex) {
 				case "even": EVEN;
 				case "odd": ODD;
-				case null: throw TmxError.MISSING_STAGGERINDEX;
-				default: throw TmxError.INVALID_STAGGERINDEX;
+				case null: throw TmxError.MISSING_MAP_STAGGERINDEX;
+				default: throw TmxError.INVALID_MAP_STAGGERINDEX;
 			};
 		}
 		else
@@ -185,7 +183,7 @@ class TmxMap
 		if (backgroundColor == null) backgroundColor = 0; // Optionnal
 
 		nextObjectId = Std.parseInt(source.att.nextobjectid);
-		if (nextObjectId == null) throw TmxError.INVALID_NEXTOBJECTID;
+		if (nextObjectId == null) throw TmxError.INVALID_MAP_NEXTOBJECTID;
 
 		// Calculate the entire size
 		fullWidth = width * tileWidth;

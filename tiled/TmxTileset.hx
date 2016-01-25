@@ -1,47 +1,48 @@
 package tiled;
 
 import haxe.xml.Fast;
-import openfl.display.BitmapData;
-import openfl.geom.Rectangle;
-import openfl.utils.ByteArray;
 
-abstract TileSetData(Fast)
+class TmxTileset
 {
-	private inline function new(f:Fast)
-		this = f;
+	// Tileset informations
+	/** The first global tile ID of this tileset (this global ID maps to the first tile in this tileset). */
+	public var firstGID(default, null):Int;
+	/** f this tileset is stored in an external TSX (Tile Set XML) file, this attribute refers to that file. */
+	public var source(default, null):String;
+	/** The name of this tileset. */
+	public var name(default, null):String;
+	/** The (maximum) width of the tiles in this tileset. */
+	public var tileWidth(default, null):Int;
+	/** The (maximum) height of the tiles in this tileset. */
+	public var tileHeight(default, null):Int;
+	/** The spacing in pixels between the tiles in this tileset (applies to the tileset image). */
+	public var spacing(default, null):Int;
+	/** The margin around the tiles in this tileset (applies to the tileset image). */
+	public var margin(default, null):Int;
+	/** The number of tiles in this tileset. */
+	public var tileCount(default, null):Int;
+	/** The number of tile columns in the tileset. */
+	public var columns(default, null):Int;
 
-	@:to public inline function toMap():Fast
-		return this;
+	// Tileset content
+	/** The properties of the tileset. */
+	public var properties(default, null):Map<String, String>;
+	/** Horizontal rendering offset for the tiles from this tileset in pixels. */
+	public var offsetX(default, null):Int;
+	/** Vertical rendering offset for the tiles from this tileset in pixels. */
+	public var offsetY(default, null):Int;
+	/** The images of this tileset. */
+	public var images(default, null):Array<TmxImage>;
+	/** The terrain types of this tileset. */
+	public var terrainTypes(default, null):Array<TmxTerrain>;
+	/** The tiles of this tileset. */
+	public var tiles(default, null):Array<TmxTile>;
 
-	@:from public static inline function fromFast(f:Fast)
-		return new TileSetData(f);
+	// Custom utility values
+	/** The number of tile rows in the tileset. */
+	public var rows(default, null):Int;
 
-	@:from public static inline function fromByteArray(ba:ByteArray)
-	{
-		var f = new Fast(Xml.parse(ba.toString()));
-		return new TileSetData(f.node.tileset);
-	}
-}
-
-class TmxTileSet
-{
-	private var _tileProps:Array<TmxPropertySet>;
-	private var _image:BitmapData;
-
-	public var firstGID:Int;
-	public var name:String;
-	public var tileWidth:Int;
-	public var tileHeight:Int;
-	public var spacing:Int=0;
-	public var margin:Int=0;
-	public var imageSource:String;
-
-	// Available only after image has been assigned:
-	public var numTiles:Int;
-	public var numRows:Int;
-	public var numCols:Int;
-
-	public function new(data:TileSetData)
+	public function new(source:Fast, map:TmxMap)
 	{
 		var node:Fast, source:Fast;
 		numTiles = 0xFFFFFF;

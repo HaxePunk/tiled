@@ -1,8 +1,7 @@
-package com.haxepunk.tmx;
+package tiled;
 
 import com.haxepunk.masks.Hitbox;
 import haxe.xml.Fast;
-import tiled.*;
 
 class TmxObject
 {

@@ -1,24 +1,14 @@
 package tiled;
 
-import com.haxepunk.tmx.TmxObject;
 import haxe.xml.Fast;
 
-class TmxObjectGroup
+class TmxObjectGroup extends TmxLayer
 {
-	public var map:TmxMap;
-	public var name:String;
-	public var x:Int;
-	public var y:Int;
-	public var width:Int;
-	public var height:Int;
-	public var opacity:Float;
-	public var visible:Bool;
-	public var properties:TmxPropertySet;
 	public var objects:Array<TmxObject>;
 
 	public function new(source:Fast, parent:TmxMap)
 	{
-		properties = new TmxPropertySet();
+		super(source, parent);
 		objects = new Array<TmxObject>();
 
 		map = parent;

@@ -1,4 +1,4 @@
-package com.haxepunk.tmx;
+package haxepunk.tmx;
 
 class TmxOrderedHash<T>
 {

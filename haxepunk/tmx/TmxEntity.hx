@@ -1,14 +1,14 @@
-package com.haxepunk.tmx;
+package haxepunk.tmx;
 
-import com.haxepunk.Entity;
-import com.haxepunk.Graphic;
-import com.haxepunk.graphics.Graphiclist;
-import com.haxepunk.graphics.Image;
-import com.haxepunk.graphics.Tilemap;
-import com.haxepunk.masks.Grid;
-import com.haxepunk.masks.SlopedGrid;
-import com.haxepunk.masks.Masklist;
-import com.haxepunk.tmx.TmxMap;
+import haxepunk.Entity;
+import haxepunk.Graphic;
+import haxepunk.graphics.Graphiclist;
+import haxepunk.graphics.Image;
+import haxepunk.graphics.Tilemap;
+import haxepunk.masks.Grid;
+import haxepunk.masks.SlopedGrid;
+import haxepunk.masks.Masklist;
+import haxepunk.tmx.TmxMap;
 
 private abstract Map(TmxMap)
 {
@@ -213,8 +213,8 @@ class TmxEntity extends Entity
 		}
 #end
 
-		var maskList = new Masklist(masks_ar);
-		this.mask = maskList;
+	//	var maskList = new Masklist(masks_ar);
+	//	this.mask = maskList;
 		this.type = typeName;
 
 	}

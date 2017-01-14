@@ -3,9 +3,9 @@
  * This content is released under the MIT License.
  * For questions mail me at heardtheword@gmail.com
  ******************************************************************************/
-package com.haxepunk.tmx;
+package haxepunk.tmx;
 import haxe.xml.Fast;
-import com.haxepunk.masks.Hitbox;
+import haxepunk.masks.Hitbox;
 
 class TmxObject
 {
@@ -22,7 +22,7 @@ class TmxObject
 	public var shapeMask:Hitbox;
 
 	#if debug
-	public var debug_graphic:com.haxepunk.graphics.Image;
+	public var debug_graphic:haxepunk.graphics.Image;
 	#end
 	
 	public function new(source:Fast, parent:TmxObjectGroup)
@@ -58,18 +58,18 @@ class TmxObject
 		// create shape, cannot do ellipses, only circles
 		if(source.hasNode.ellipse){
 			var radius = Std.int(((width < height)? width : height)/2);
-			shapeMask = new com.haxepunk.masks.Circle(radius, x, y);
+			shapeMask = new haxepunk.masks.Circle(radius, x, y);
 
 #if debug
-			debug_graphic = com.haxepunk.graphics.Image.createCircle(radius, 0xff0000, .6);
+			debug_graphic = haxepunk.graphics.Image.createCircle(radius, 0xff0000, .6);
 			debug_graphic.x = x;
 			debug_graphic.y = y;
 #end
 		}else{ // rect
-			shapeMask = new com.haxepunk.masks.Hitbox(width, height, x, y);
+			shapeMask = new haxepunk.masks.Hitbox(width, height, x, y);
 
 #if debug
-			debug_graphic = com.haxepunk.graphics.Image.createRect(width, height, 0xff0000, .6);
+			debug_graphic = haxepunk.graphics.Image.createRect(width, height, 0xff0000, .6);
 			debug_graphic.x = x;
 			debug_graphic.y = y;
 #end

@@ -3,7 +3,7 @@
  * This content is released under the MIT License.
  * For questions mail me at heardtheword@gmail.com
  ******************************************************************************/
-package com.haxepunk.tmx;
+package haxepunk.tmx;
 
 import flash.display.BitmapData;
 import flash.geom.Rectangle;
@@ -36,6 +36,8 @@ class TmxTileSet
 	public var spacing:Int=0;
 	public var margin:Int=0;
 	public var imageSource:String;
+	public var imageWidth:Int;
+	public var imageHeight:Int;
 
 	//available only after image has been assigned:
 	public var numTiles:Int;
@@ -61,7 +63,9 @@ class TmxTileSet
 		{
 			var node:Fast = source.node.image;
 			imageSource = node.att.source;
-
+			if (node.has.width) imageWidth = Std.parseInt(node.att.width);
+			if (node.has.height) imageHeight = Std.parseInt(node.att.height);
+			
 			name = source.att.name;
 			if (source.has.tilewidth) tileWidth = Std.parseInt(source.att.tilewidth);
 			if (source.has.tileheight) tileHeight = Std.parseInt(source.att.tileheight);

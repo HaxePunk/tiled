@@ -6,5 +6,5 @@
 	"description": "Tiled TMX loader for HaxePunk",
 	"version": "1.0.4",
 	"releasenote": "Bug fix",
-	"contributors": ["heardtheword", "_ibilon"]
+	"contributors": ["heardtheword", "_ibilon", "bendmorris"]
 }

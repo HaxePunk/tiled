@@ -5,6 +5,7 @@ import haxepunk.Graphic;
 import haxepunk.graphics.Graphiclist;
 import haxepunk.graphics.Image;
 import haxepunk.graphics.Tilemap;
+import haxepunk.Mask;
 import haxepunk.masks.Grid;
 import haxepunk.masks.SlopedGrid;
 import haxepunk.masks.Masklist;
@@ -193,7 +194,7 @@ class TmxEntity extends Entity
 
 		var objectGroup:TmxObjectGroup = map.getObjectGroup(collideLayer);
 
-		var masks_ar = new Array<Dynamic>();
+		var masks_ar = new Array<Mask>();
 #if debug
 		var debug_graphics_ar = new Array<Graphic>();
 #end
@@ -213,8 +214,8 @@ class TmxEntity extends Entity
 		}
 #end
 
-	//	var maskList = new Masklist(masks_ar);
-	//	this.mask = maskList;
+		var maskList = new Masklist(masks_ar);
+		this.mask = maskList;
 		this.type = typeName;
 
 	}

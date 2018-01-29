@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+	<meta title="example" package="com.example.app" version="1.0.0" company=""/>
+
+	<app file="Main" main="Main" path="export"/>
+
+	<window fps="60" background="0x333333"/>
+	<window width="640" height="480" resizable="true" unless="mobile"/>
+	<window width="0" height="0" fullscreen="true" if="mobile"/>
+	<window orientation="landscape" vsync="true" antialiasing="0" if="cpp"/>
+
+	<source path="source"/>
+
+	<haxelib name="HaxePunk"/>
+	<haxelib name="HaxePunkTmx" />
+
+	<haxedef name="debug_console" if="debug" />
+
+	<assets path="assets/graphics" rename="graphics" include="*.png|*.jpg"/>
+	<assets path="assets/audio" rename="audio" include="*.mp3" if="flash"/>
+	<assets path="assets/audio" rename="audio" include="*.wav|*.ogg" unless="flash"/>
+	<assets path="assets/font" rename="font" include="*.ttf"/>
+	<assets path="assets/maps" rename="maps" include="*.tmx" />
+
+	<icon path="assets/HaxePunk.svg"/>
+</project>

@@ -13,7 +13,7 @@ class TmxPropertySet implements Dynamic<String>
 	public function new()
 	{
 #if haxe3
-		keys = new Map<String,String>();
+		keys = new Map<String, String>();
 #else
 		keys = new Hash<String>();
 #end
@@ -39,7 +39,7 @@ class TmxPropertySet implements Dynamic<String>
 	}
 
 #if haxe3
-	private var keys:Map<String,String>;
+	private var keys:Map<String, String>;
 #else
 	private var keys:Hash<String>;
 #end

@@ -124,13 +124,15 @@ class TmxMap
 	//works only after TmxTileSet has been initialized with an image...
 	public function getGidOwner(gid:Int):TmxTileSet
 	{
-		var last:TmxTileSet = null;
 		var set:TmxTileSet;
 		for (set in tilesets)
 		{
-			if(set.hasGid(gid))
+			if (set.hasGid(gid))
+			{
 				return set;
+			}
 		}
+
 		return null;
 	}
 	
@@ -140,9 +142,12 @@ class TmxMap
 		var set:TmxTileSet;
 		for (set in tilesets)
 		{
-			if(set.hasGid(gid) && set.getPropertiesByGid(gid) != null)
+			if (set.hasGid(gid) && set.getPropertiesByGid(gid) != null)
+			{
 				return set.getPropertiesByGid(gid).resolve(property);
+			}
 		}
+
 		return null;
 	}
 
@@ -151,12 +156,14 @@ class TmxMap
 		var index = -1;
 		var i = 0;
 		for (key in layers.keys())
+		{
 			if (key == name)
 			{
 				index = i;
 				break;
 			}
 			i++;
+		}
 
 		if (index == -1)
 			return 0;

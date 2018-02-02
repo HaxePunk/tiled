@@ -4,6 +4,7 @@
  * For questions mail me at heardtheword@gmail.com
  ******************************************************************************/
 package haxepunk.tmx;
+
 import haxe.xml.Fast;
 
 class TmxObjectGroup

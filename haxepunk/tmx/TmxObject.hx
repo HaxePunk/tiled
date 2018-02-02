@@ -4,6 +4,7 @@
  * For questions mail me at heardtheword@gmail.com
  ******************************************************************************/
 package haxepunk.tmx;
+
 import haxe.xml.Fast;
 import haxepunk.masks.Hitbox;
 
@@ -37,15 +38,14 @@ class TmxObject
 		//resolve inheritence
 		shared = null;
 		gid = -1;
-		if(source.has.gid && source.att.gid.length != 0) //object with tile association?
+		if (source.has.gid && source.att.gid.length != 0) //object with tile association?
 		{
 			gid = Std.parseInt(source.att.gid);
 			var set:TmxTileSet;
 			for (set in group.map.tilesets)
 			{
 				shared = set.getPropertiesByGid(gid);
-				if(shared != null)
-					break;
+				if (shared != null) break;
 			}
 		}
 		
@@ -56,8 +56,9 @@ class TmxObject
 			custom.extend(node);
 
 		// create shape, cannot do ellipses, only circles
-		if(source.hasNode.ellipse){
-			var radius = Std.int(((width < height)? width : height)/2);
+		if (source.hasNode.ellipse)
+		{
+			var radius = Std.int(((width < height)? width : height) / 2);
 			shapeMask = new haxepunk.masks.Circle(radius, x, y);
 
 #if debug
@@ -65,7 +66,9 @@ class TmxObject
 			debug_graphic.x = x;
 			debug_graphic.y = y;
 #end
-		}else{ // rect
+		}
+		else
+		{ // rect
 			shapeMask = new haxepunk.masks.Hitbox(width, height, x, y);
 
 #if debug

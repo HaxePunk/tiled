@@ -7,7 +7,6 @@ package haxepunk.tmx;
 
 import flash.utils.ByteArray;
 import flash.utils.Endian;
-import flash.Lib;
 import haxe.xml.Fast;
 
 class TmxLayer
@@ -43,21 +42,22 @@ class TmxLayer
 		//load tile GIDs
 		tileGIDs = [];
 		var data:Fast = source.node.data;
-		if(data != null)
+		if (data != null)
 		{
 			var chunk:String = "";
 			var data_encoding = "default";
-			if(data.has.encoding){
+			if (data.has.encoding)
+			{
 				data_encoding = data.att.encoding;
 			}
-			switch(data_encoding)
+			switch (data_encoding)
 			{
 				case "base64":
 					chunk = data.innerData;
 					var compressed:Bool = false;
 					if (data.has.compression)
 					{
-						switch(data.att.compression)
+						switch (data.att.compression)
 						{
 							case "zlib":
 								compressed = true;
@@ -76,7 +76,7 @@ class TmxLayer
 					for (node in data.nodes.tile)
 					{
 						//new line?
-						if(++lineWidth >= width)
+						if (++lineWidth >= width)
 						{
 							tileGIDs[++rowIdx] = new Array<Int>();
 							lineWidth = 0;
@@ -88,11 +88,11 @@ class TmxLayer
 		}
 	}
 	
-	public function toCsv(tileSet:TmxTileSet = null):String
+	public function toCsv(?tileSet:TmxTileSet):String
 	{
 		var max:Int = 0xFFFFFF;
 		var offset:Int = 0;
-		if(tileSet != null)
+		if (tileSet != null)
 		{
 			offset = tileSet.firstGID;
 			max = tileSet.numTiles - 1;
@@ -105,7 +105,7 @@ class TmxLayer
 			for (id in row)
 			{
 				id -= offset;
-				if(id < 0 || id > max)
+				if (id < 0 || id > max)
 					id = 0;
 				result +=  id + ",";
 			}
@@ -122,7 +122,7 @@ class TmxLayer
 		for each(var entry:uint in input)
 		{
 			result += entry+",";
-			if(--lineBreaker == 0)
+			if (--lineBreaker == 0)
 			{
 				result += "\n";
 				lineBreaker = lineWidth;
@@ -154,7 +154,7 @@ class TmxLayer
 	{
 		var result:Array<Array<Int>> = new Array<Array<Int>>();
 		var data:ByteArray = base64ToByteArray(chunk);
-		if(compressed)
+		if (compressed)
 		{
 			#if (js && !format)
 			throw "Need the format library to use compressed map on html5";
@@ -164,7 +164,7 @@ class TmxLayer
 		}
 			
 		data.endian = Endian.LITTLE_ENDIAN;
-		while(data.position < data.length)
+		while (data.position < data.length)
 		{
 			var resultRow:Array<Int> = new Array<Int>();
 			var i:Int;
@@ -204,11 +204,11 @@ class TmxLayer
 			var a3:Int = lookup[data.charCodeAt(i + 3)];
 			
 			// convert to and write 3 bytes
-			if(a1 < 64)
+			if (a1 < 64)
 				output.writeByte((a0 << 2) + ((a1 & 0x30) >> 4));
-			if(a2 < 64)
+			if (a2 < 64)
 				output.writeByte(((a1 & 0x0f) << 4) + ((a2 & 0x3c) >> 2));
-			if(a3 < 64)
+			if (a3 < 64)
 				output.writeByte(((a2 & 0x03) << 6) + a3);
 			
 			i += 4;

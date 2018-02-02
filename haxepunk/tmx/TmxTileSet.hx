@@ -18,7 +18,8 @@ abstract TileSetData(Fast)
 	@:from public static inline function fromFast(f:Fast)
 		return new TileSetData(f);
 
-	@:from public static inline function fromByteArray(ba:ByteArray) {
+	@:from public static inline function fromByteArray(ba:ByteArray)
+	{
 		var f = new Fast(Xml.parse(ba.toString()));
 		return new TileSetData(f.node.tileset);
 	}
@@ -55,10 +56,7 @@ class TmxTileSet
 		firstGID = (source.has.firstgid) ? Std.parseInt(source.att.firstgid) : 1;
 
 		// check for external source
-		if (source.has.source)
-		{
-
-		}
+		if (source.has.source) {}
 		else // internal
 		{
 			var node:Fast = source.node.image;

@@ -7,12 +7,12 @@ import haxepunk.math.Vector2;
 
 class Player extends Entity
 {
-    public static inline var GRAVITY:Float = 980;
-    public static inline var MAX_VEL:Float = 300;
-    public static inline var JUMP_VEL:Float = -300;
-    public static inline var GROUND_FRICTION:Float = 500;
-    public static inline var GROUND_ACCEL:Float = 1200;
-    public static inline var AIR_ACCEL:Float = 500;
+    public var gravity(default, null):Float;
+    public var maxVel:Float;
+    public var jumpVel:Float;
+    public var groundFriction:Float;
+    public var groundAccel:Float;
+    public var airAccel:Float;
 
     var _vel:Vector2;
     var _grounded:Bool;
@@ -36,8 +36,10 @@ class Player extends Entity
     {
         applyVelocity();
 
-        if( !_grounded ) applyGravity();
-        else if ( !_isMovingHorizontal ) applyFriction();
+        if( !_grounded )
+            applyGravity();
+        else if ( !_isMovingHorizontal ) // If we are on the ground and no horizaontal movement commands were made this frame
+            applyFriction();
 
         _isMovingHorizontal = false;
     }
@@ -54,7 +56,7 @@ class Player extends Entity
 
     override public function moveCollideY( other:Entity ):Bool
     {
-        // react if we are moving down and are on the ground
+        // stop if we hit the ground and are moving down
         if(other.type == "ground" && _vel.y > 0)
         {
             _vel.y = 0;
@@ -64,11 +66,21 @@ class Player extends Entity
         return true;
     }
 
+    public function setProperties(gravity:Float, maxVel:Float, jumpVel:Float, groundAccel:Float, groundFriction:Float, airAccel:Float):Void
+    {
+        this.gravity = gravity;
+        this.maxVel = maxVel;
+        this.jumpVel = jumpVel;
+        this.groundAccel = groundAccel;
+        this.groundFriction = groundFriction;
+        this.airAccel = airAccel;
+    }
+
     public function jump():Void
     {
         if(_grounded)
         {
-            _vel.y = JUMP_VEL;
+            _vel.y = jumpVel;
             _grounded = false;
         }
     }
@@ -77,10 +89,11 @@ class Player extends Entity
     {
         _isMovingHorizontal = true;
 
+        // we negate here because approach() only works from the left
         _vel.x = -MathUtil.approach(
             -_vel.x,
-            MAX_VEL,
-            (_grounded ? GROUND_ACCEL : AIR_ACCEL) * HXP.elapsed * HXP.rate
+            maxVel,
+            (_grounded ? groundAccel : airAccel) * HXP.elapsed * HXP.rate
         );
     }
 
@@ -90,8 +103,8 @@ class Player extends Entity
 
         _vel.x = MathUtil.approach(
             _vel.x,
-            MAX_VEL,
-            (_grounded ? GROUND_ACCEL : AIR_ACCEL) * HXP.elapsed * HXP.rate
+            maxVel,
+            (_grounded ? groundAccel : airAccel) * HXP.elapsed * HXP.rate
         );
     }
 
@@ -109,8 +122,8 @@ class Player extends Entity
     {
         _vel.y = MathUtil.approach(
             _vel.y,
-            MAX_VEL,
-            GRAVITY * HXP.elapsed * HXP.rate
+            maxVel,
+            gravity * HXP.elapsed * HXP.rate
         );
     }
 
@@ -118,13 +131,14 @@ class Player extends Entity
     {
         var sign = MathUtil.sign(_vel.x);
         var abs = Math.abs(_vel.x);
-        var step = GROUND_FRICTION * HXP.elapsed * HXP.rate;
+        var step = groundFriction * HXP.elapsed * HXP.rate;
 
-        if(abs > 0)
-        {
-            if(abs - step < 0) abs = 0;
-            else abs -= step;
-        }
+        // we negate here because approach() only works from the left
+        abs = -MathUtil.approach(
+            -abs,
+            0,
+            step
+        );
 
         _vel.x = abs * sign;
     }

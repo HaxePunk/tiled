@@ -4,6 +4,7 @@ import haxepunk.input.Key;
 import haxepunk.graphics.atlas.TileAtlas;
 import haxepunk.graphics.Image;
 import haxepunk.tmx.TmxEntity;
+import haxepunk.tmx.TmxObject;
 import haxepunk.utils.Color;
 
 class MainScene extends Scene
@@ -48,14 +49,24 @@ class MainScene extends Scene
 		e.loadMask("foreground", "ground");
 
 		var p = e.map.getObjectGroup("playerSpawn").objects[0];
-		createPlayer(p.x, p.y);
+		createPlayer(p);
 	}
 
-	@:extern inline function createPlayer(x:Float, y:Float):Void
+	@:extern inline function createPlayer(obj:TmxObject):Void
 	{
-		var img = Image.createRect( 16, 16, Color.getColorRGB(255, 0, 0));
-		_player = new Player(x, y, img);
-		_player.setHitbox( 16, 16 );
+		var img = Image.createRect( obj.width, obj.height, Color.getColorRGB(255, 0, 0));
+		_player = new Player(obj.x, obj.y, img);
+		_player.setHitbox( obj.width, obj.height );
+
+		// resolving custom properties from a TmxObject
+		_player.setProperties(
+			Std.parseFloat(obj.custom.resolve("gravity")),
+			Std.parseFloat(obj.custom.resolve("maxVelocity")),
+			Std.parseFloat(obj.custom.resolve("jumpVelocity")),
+			Std.parseFloat(obj.custom.resolve("groundAcceleration")),
+			Std.parseFloat(obj.custom.resolve("groundFriction")),
+			Std.parseFloat(obj.custom.resolve("airAcceleration"))
+		);
 
 		this.add(_player);
 	}

@@ -6,12 +6,10 @@ import haxepunk.assets.AssetLoader;
 import haxepunk.graphics.Graphiclist;
 import haxepunk.graphics.Image;
 import haxepunk.graphics.tile.Tilemap;
-import haxepunk.graphics.atlas.TileAtlas;
 import haxepunk.Mask;
 import haxepunk.masks.Grid;
 import haxepunk.masks.SlopedGrid;
 import haxepunk.masks.Masklist;
-import haxepunk.tmx.TmxMap;
 
 private abstract Map(TmxMap)
 {
@@ -46,7 +44,7 @@ class TmxEntity extends Entity
 
 	public function loadImageLayer(name:String)
 	{
-		if (map.imageLayers.exists(name) == false)
+		if (!map.imageLayers.exists(name))
 		{
 #if debug
 			trace("Image layer '" + name + "' doesn't exist");
@@ -57,12 +55,12 @@ class TmxEntity extends Entity
 		addGraphic(new Image(map.imageLayers.get(name)));
 	}
 
-	public function loadGraphic(tileset:Graphic.TileType, layerNames:Array<String>, skip:Array<Int> = null)
+	public function loadGraphic(tileset:Graphic.TileType, layerNames:Array<String>, ?skip:Array<Int>)
 	{
 		var gid:Int, layer:TmxLayer;
 		for (name in layerNames)
 		{
-			if (map.layers.exists(name) == false)
+			if (!map.layers.exists(name))
 			{
 #if debug
 				trace("Layer '" + name + "' doesn't exist");
@@ -81,7 +79,7 @@ class TmxEntity extends Entity
 				{
 					gid = layer.tileGIDs[row][col] - 1;
 					if (gid < 0) continue;
-					if (skip == null || Lambda.has(skip, gid) == false)
+					if (skip == null || !Lambda.has(skip, gid))
 					{
 						tilemap.setTile(col, row, gid);
 					}
@@ -91,7 +89,7 @@ class TmxEntity extends Entity
 		}
 	}
 
-	public function loadMask(collideLayer:String = "collide", typeName:String = "solid", skip:Array<Int> = null)
+	public function loadMask(collideLayer:String = "collide", typeName:String = "solid", ?skip:Array<Int>)
 	{
 		var tileCoords:Array<TmxVec4> = new Array<TmxVec4>();
 		if (!map.layers.exists(collideLayer))
@@ -113,10 +111,10 @@ class TmxEntity extends Entity
 			{
 				gid = layer.tileGIDs[row][col] - 1;
 				if (gid < 0) continue;
-				if (skip == null || Lambda.has(skip, gid) == false)
+				if (skip == null || !Lambda.has(skip, gid))
 				{
 					grid.setTile(col, row, true);
-					tileCoords.push(new TmxVec4(col*map.tileWidth, row*map.tileHeight, map.tileWidth, map.tileHeight));
+					tileCoords.push(new TmxVec4(col * map.tileWidth, row * map.tileHeight, map.tileWidth, map.tileHeight));
 				}
 			}
 		}
@@ -196,27 +194,29 @@ class TmxEntity extends Entity
 
 		var objectGroup:TmxObjectGroup = map.getObjectGroup(collideLayer);
 
-		var masks_ar = new Array<Mask>();
+		var maskArr  = new Array<Mask>();
 #if debug
 		var debug_graphics_ar = new Array<Graphic>();
 #end
 
 		// Loop through objects
-		for(object in objectGroup.objects){ // :TmxObject
-			masks_ar.push(object.shapeMask);
+		for (object in objectGroup.objects)
+		{ // :TmxObject
+			maskArr .push(object.shapeMask);
 #if debug
 			debug_graphics_ar.push(object.debug_graphic);
 #end
 		}
 
 #if debug
-		if(debugObjectMask){
+		if (debugObjectMask)
+		{
 			var debug_graphicList = new Graphiclist(debug_graphics_ar);
 			this.addGraphic(debug_graphicList);
 		}
 #end
 
-		var maskList = new Masklist(masks_ar);
+		var maskList = new Masklist(maskArr );
 		this.mask = maskList;
 		this.type = typeName;
 

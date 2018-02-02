@@ -4,7 +4,7 @@ class TmxOrderedHash<T>
 {
 	var _keys:Array<String>;
 #if haxe3
-	var _map:Map<String,T>;
+	var _map:Map<String, T>;
 #else
 	var _map:Hash<T>;
 #end
@@ -13,7 +13,7 @@ class TmxOrderedHash<T>
 	{
 		_keys = new Array<String>();
 #if haxe3
-		_map = new Map<String,T>();
+		_map = new Map<String, T>();
 #else
 		_map = new Hash<T>();
 #end
@@ -22,7 +22,7 @@ class TmxOrderedHash<T>
 	public inline function set(key:String, value:T)
 	{
 		if (!_map.exists(key)) _keys.push(key);
-		_map.set(key,value);
+		_map.set(key, value);
 	}
 
 	public inline function remove(key:String) : Bool
@@ -31,8 +31,8 @@ class TmxOrderedHash<T>
 		return _map.remove(key);
 	}
 
-	public inline function exists(key:String) { return _map.exists(key); }
-	public inline function get(key:String) { return _map.get(key); }
+	public inline function exists(key:String):Bool return _map.exists(key);
+	public inline function get(key:String):T return _map.get(key);
 
 	public function iterator():Iterator<T>
 	{
@@ -52,7 +52,12 @@ class TmxOrderedHash<T>
 	public function toString()
 	{
 		var __map = _map;
-		var pairs = Lambda.map(_keys, function(x:String) { return x + ' => ' + __map.get(x); });
-		return  "{"+ pairs.join(', ') + "}";
+		var pairs = Lambda.map(_keys,
+			function(x:String)
+			{
+				return x + ' => ' + __map.get(x);
+			}
+		);
+		return  "{" + pairs.join(', ') + "}";
 	}
 }

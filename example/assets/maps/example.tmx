@@ -12,6 +12,15 @@
   </data>
  </layer>
  <objectgroup name="playerSpawn">
-  <object id="1" x="208" y="448" width="16" height="16"/>
+  <object id="1" x="208" y="448" width="16" height="16">
+   <properties>
+    <property name="airAcceleration" type="float" value="500"/>
+    <property name="gravity" type="float" value="980"/>
+    <property name="groundAcceleration" type="float" value="1200"/>
+    <property name="groundFriction" type="float" value="500"/>
+    <property name="jumpVelocity" type="float" value="-300"/>
+    <property name="maxVelocity" type="float" value="300"/>
+   </properties>
+  </object>
  </objectgroup>
 </map>

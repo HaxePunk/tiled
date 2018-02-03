@@ -9,19 +9,68 @@ import flash.utils.ByteArray;
 import flash.utils.Endian;
 import haxe.xml.Fast;
 
+/**
+ *  A data class that represents a Tiled TileLayer.
+ */
 class TmxLayer
 {
+	/**
+	 *  The parent map of this layer.
+	 */
 	public var map:TmxMap;
+
+	/**
+	 *  The name of this layer.
+	 */
 	public var name:String;
+
+	/**
+	 *  The x coordinate of the layer in tiles. Defaults to 0 and can not be changed in Tiled.
+	 */
 	public var x:Int;
+
+	/**
+	 *  The y coordinate of the layer in tiles. Defaults to 0 and can not be changed in Tiled.
+	 */
 	public var y:Int;
+
+	/**
+	 *  The width of the layer in tiles. Always the same as the map width for fixed-size maps.
+	 */
 	public var width:Int;
+
+	/**
+	 *  The height of the layer in tiles. Always the same as the map height for fixed-size maps.
+	 */
 	public var height:Int;
+
+	/**
+	 *  The opacity of the layer as a value from 0 to 1. Defaults to 1.
+	 */
 	public var opacity:Float;
+
+	/**
+	 *  Whether the layer is shown or hidden.  Defaults to true.
+	 */
 	public var visible:Bool;
+
+
+	/**
+	 *  A 2D array of the tile gids.  Indexed by [row][col].
+	 */
 	public var tileGIDs:Array<Array<Int>>;
+
+	/**
+	 *  The custom properties of this layer.
+	 */
 	public var properties:TmxPropertySet;
 	
+	/**
+	 *  Constructor.
+	 *  
+	 *  @param source - The Xml.Fast node that represents this layer.
+	 *  @param parent - The TmxMap this layer belongs to.
+	 */
 	public function new(source:Fast, parent:TmxMap)
 	{
 		properties = new TmxPropertySet();
@@ -88,6 +137,12 @@ class TmxLayer
 		}
 	}
 	
+	/**
+	 *  Exports this tileLayer to a comma separated value string.
+	 *  
+	 *  @param tileSet - An optional tileset that is used to validate the tile index's.
+	 *  @return String
+	 */
 	public function toCsv(?tileSet:TmxTileSet):String
 	{
 		var max:Int = 0xFFFFFF;

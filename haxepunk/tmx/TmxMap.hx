@@ -29,24 +29,80 @@ abstract MapData(Fast)
 		return new MapData(new Fast(Xml.parse(ba.toString())));
 }
 
+/**
+ *  The top level class that represents a Tiled Map in code.
+ */
 class TmxMap
 {
+	/**
+	 *  Version of the TMX format used.
+	 */
 	public var version:String;
+
+	/**
+	 *  Map orientation. Tiled supports “orthogonal”, “isometric”, “staggered” and “hexagonal” (since 0.11).
+	 */
 	public var orientation:String;
 
+	/**
+	 *  The map width in tiles.
+	 */
 	public var width:Int;
+
+	/**
+	 *  The map height in tiles.
+	 */
 	public var height:Int;
+
+	/**
+	 *  The width of a tile.
+	 */
 	public var tileWidth:Int;
+
+	/**
+	 *  The height of a tile.
+	 */
 	public var tileHeight:Int;
+
+	/**
+	 *  The full width of the map in pixels.
+	 */
 	public var fullWidth:Int;
+
+	/**
+	 *  The full height of the map in pixels.
+	 */
 	public var fullHeight:Int;
 
+	/**
+	 *  The custom properties of this map.
+	 */
 	public var properties(default, null):TmxPropertySet;
+
+	/**
+	 *  The tilesets of this map.
+	 */
 	public var tilesets:Array<TmxTileSet>;
+
+	/**
+	 *  The tile layers in this map.
+	 */
 	public var layers:TmxOrderedHash<TmxLayer>;
+
+	/**
+	 *  The image layers in this map.
+	 */
 	public var imageLayers:Map<String, String>;
+
+	/**
+	 *  The object groups/layers in this map.
+	 */
 	public var objectGroups:TmxOrderedHash<TmxObjectGroup>;
 
+	/**
+	 *  Constructor.
+	 *  @param data - Data to load that defins this TmxMap.
+	 */
 	public function new(data:MapData)
 	{
 		properties = new TmxPropertySet();
@@ -106,22 +162,44 @@ class TmxMap
 		// 	imageLayers.set(node.att.name, new TmxImageLayer(node));
 	}
 
+	/**
+	 *  Loads a TmxMap from a specified file in the assets.
+	 *  @param name - The file to load.
+	 *  @return TmxMap
+	 */
 	public static function loadFromFile(name:String):TmxMap
 	{
 		return new TmxMap(Assets.getText(name));
 	}
 
+	/**
+	 *  Gets a tile layer from this map by name.
+	 *  @param name - The name of the tile layer.
+	 *  @return TmxLayer
+	 */
 	public function getLayer(name:String):TmxLayer
 	{
 		return layers.get(name);
 	}
 
+	/**
+	 *  Gets an object group from this map by name.
+	 *  @param name - The name of the object group.
+	 *  @return TmxObjectGroup
+	 */
 	public function getObjectGroup(name:String):TmxObjectGroup
 	{
 		return objectGroups.get(name);
 	}
 
-	//works only after TmxTileSet has been initialized with an image...
+	/**
+	 *  Gets the tileset which owns a specific tile gid.
+	 *  
+	 *  Only works after a TmxTileSet has been initialized with an image.
+	 *  
+	 *  @param gid - The gid to use for the search.
+	 *  @return TmxTileSet
+	 */
 	public function getGidOwner(gid:Int):TmxTileSet
 	{
 		var set:TmxTileSet;
@@ -136,7 +214,16 @@ class TmxMap
 		return null;
 	}
 	
-	public function getGidProperty(gid:Int, property:String)
+	/**
+	 *  Gets a named property for a specific tile gid.
+	 *  
+	 *  Only works after a TmxtileSet has been initialized with an image.
+	 *  
+	 *  @param gid - The gid of the tile.
+	 *  @param property - The named property of the tile to retrieve.
+	 *  @return String
+	 */
+	public function getGidProperty(gid:Int, property:String):String
 	{
 		var last:TmxTileSet = null;
 		var set:TmxTileSet;
@@ -151,6 +238,11 @@ class TmxMap
 		return null;
 	}
 
+	/**
+	 *  Gets the spacing for the tileset used in a layer.
+	 *  @param name - Name of the layer.
+	 *  @return Int
+	 */
 	public function getTileMapSpacing(name:String):Int
 	{
 		var index = -1;

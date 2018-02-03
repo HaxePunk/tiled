@@ -9,17 +9,61 @@ import haxe.xml.Fast;
 
 class TmxObjectGroup
 {
+	/**
+	 *  The parent map of this group.
+	 */
 	public var map:TmxMap;
+
+	/**
+	 *  The name of this group.
+	 */
 	public var name:String;
+
+	/**
+	 *  The x coordinate of the object group in tiles. Defaults to 0 and can no longer be changed in Tiled.
+	 */
 	public var x:Int;
+
+	/**
+	 *  The y coordinate of the object group in tiles. Defaults to 0 and can no longer be changed in Tiled.
+	 */
 	public var y:Int;
+
+	/**
+	 *  The width of the object group in tiles. Meaningless.
+	 */
 	public var width:Int;
+
+	/**
+	 *  The height of the object group in tiles. Meaningless.
+	 */
 	public var height:Int;
+
+	/**
+	 *  The opacity of the layer as a value from 0 to 1. Defaults to 1.
+	 */
 	public var opacity:Float;
+
+	/**
+	 *  Whether to group is shown or hiddin.
+	 */
 	public var visible:Bool;
+
+	/**
+	 *  The custom properties of this group.
+	 */
 	public var properties:TmxPropertySet;
+
+	/**
+	 *  The objects in this group.
+	 */
 	public var objects:Array<TmxObject>;
 	
+	/**
+	 *  Constructor.
+	 *  @param source - The Fast source representing this group.
+	 *  @param parent - The parent Map of this group.
+	 */
 	public function new(source:Fast, parent:TmxMap)
 	{
 		properties = new TmxPropertySet();

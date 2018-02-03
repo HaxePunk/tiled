@@ -10,22 +10,72 @@ import haxepunk.masks.Hitbox;
 
 class TmxObject
 {
+	/**
+	 *  The Object Group this object belongs to.
+	 */
 	public var group:TmxObjectGroup;
+
+	/**
+	 *  The name of this object.
+	 */
 	public var name:String;
+
+	/**
+	 *  The type of an object.
+	 */
 	public var type:String;
+
+	/**
+	 *  The x coordinate of the object in pixels.
+	 */
 	public var x:Int;
+
+	/**
+	 *  The y coordinate of the object in pixels.
+	 */
 	public var y:Int;
+
+	/**
+	 *  The width of the object in pixels.
+	 */
 	public var width:Int;
+
+	/**
+	 *  The height of the object in pixels.
+	 */
 	public var height:Int;
+
+	/**
+	 *  [Optional] A referene to a tile.
+	 */
 	public var gid:Int;
+
+	/**
+	 *  The custom properties of this object.
+	 */
 	public var custom:TmxPropertySet;
+
+	/**
+	 *  The shared custom properties of this object.
+	 */
 	public var shared:TmxPropertySet;
+
+	/**
+	 *  The mask of this object.
+	 *  
+	 *  Possible types are Hitbox and Circle (cannot do ellipses).
+	 */
 	public var shapeMask:Hitbox;
 
 	#if debug
 	public var debug_graphic:haxepunk.graphics.Image;
 	#end
 	
+	/**
+	 *  Constructor.
+	 *  @param source - The Fast node representing this object.
+	 *  @param parent - The parent Object Group.
+	 */
 	public function new(source:Fast, parent:TmxObjectGroup)
 	{
 		group = parent;

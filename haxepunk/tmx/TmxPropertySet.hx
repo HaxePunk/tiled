@@ -7,9 +7,15 @@ package haxepunk.tmx;
 
 import haxe.xml.Fast;
 
+/**
+ *  A set of custom properties.
+ */
 class TmxPropertySet implements Dynamic<String>
 {
 
+	/**
+	 *  Constructor.
+	 */
 	public function new()
 	{
 #if haxe3
@@ -19,16 +25,30 @@ class TmxPropertySet implements Dynamic<String>
 #end
 	}
 
+	/**
+	 *  Resolves a custom property.
+	 *  @param name - Name of the property to resolve.
+	 *  @return String
+	 */
 	public function resolve(name:String):String
 	{
 		return keys.get(name);
 	}
 
+	/**
+	 *  Checks for the existence of a custom property.
+	 *  @param name - The name of the custom property.
+	 *  @return Bool
+	 */
 	public function has(name:String):Bool
 	{
 		return keys.exists(name);
 	}
 
+	/**
+	 *  Adds custom properties to this set.
+	 *  @param source - The Fast source of the custom properties to add.
+	 */
 	public function extend(source:Fast)
 	{
 		var prop:Fast;

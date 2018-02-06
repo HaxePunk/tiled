@@ -1,9 +1,0 @@
-{
-	"haxe.displayConfigurations": [
-		[".vscode/completion-openfl.hxml"]
-	],
-	"haxe.diagnosticsPathFilter": "${workspaceRoot}/source",
-	"search.exclude": {
-		"export/**/*.hx": true
-	}
-}

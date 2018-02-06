@@ -10,6 +10,7 @@ import haxepunk.Mask;
 import haxepunk.masks.Grid;
 import haxepunk.masks.SlopedGrid;
 import haxepunk.masks.Masklist;
+import haxepunk.tmx.TmxMap;
 
 private abstract Map(TmxMap)
 {

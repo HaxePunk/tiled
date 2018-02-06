@@ -245,20 +245,15 @@ class TmxMap
 	 */
 	public function getTileMapSpacing(name:String):Int
 	{
-		var index = -1;
-		var i = 0;
-		for (key in layers.keys())
+		var layer = layers.get(name);
+		for (tileset in tilesets)
 		{
-			if (key == name)
+			if(tileset.hasGid(layer.firstGID))
 			{
-				index = i;
-				break;
+				return tileset.spacing;
 			}
-			i++;
 		}
 
-		if (index == -1)
-			return 0;
-		return tilesets[index].spacing;
+		return 0;
 	}
 }

@@ -64,6 +64,11 @@ class TmxLayer
 	 *  The custom properties of this layer.
 	 */
 	public var properties:TmxPropertySet;
+
+	/**
+	 *  The first Tile GID of the tileset used by this layer.
+	 */
+	public var firstGID:Int;
 	
 	/**
 	 *  Constructor.
@@ -133,6 +138,17 @@ class TmxLayer
 						var gid:Int = Std.parseInt(node.att.gid);
 						tileGIDs[rowIdx].push(gid);
 					}
+			}
+
+			firstGID = -1;
+			for (i in 0 ... tileGIDs.length)
+			{
+				for (j in 0 ... tileGIDs[0].length)
+				{
+					var gid = tileGIDs[i][j];
+					if (gid != -1)
+						firstGID = (firstGID < gid ? firstGID : gid);
+				}
 			}
 		}
 	}

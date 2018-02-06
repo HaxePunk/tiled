@@ -1,3 +1,5 @@
+![Build Status](https://travis-ci.org/IkonOne/tiled.svg?branch=dev)
+
 # HaxePunk Tiled
 
 ## Add the HaxePunk Tiled library to your game

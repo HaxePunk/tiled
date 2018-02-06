@@ -9,6 +9,7 @@ import haxepunk.graphics.tile.Tilemap;
 import haxepunk.Mask;
 import haxepunk.masks.Grid;
 import haxepunk.masks.SlopedGrid;
+import haxepunk.masks.SlopedGrid.TileType;
 import haxepunk.masks.Masklist;
 import haxepunk.tmx.TmxMap;
 
@@ -151,57 +152,61 @@ class TmxEntity extends Entity
 		return tileCoords;
 	}
 	
-// 	public function loadSlopedMask(collideLayer:String = "collide", typeName:String = "solid", skip:Array<Int> = null)
-// 	{
-// 		if (!map.layers.exists(collideLayer))
-// 		{
-// #if debug
-// 				trace("Layer '" + collideLayer + "' doesn't exist");
-// #end
-// 			return;
-// 		}
+	public function loadSlopedMask(collideLayer:String = "collide", typeName:String = "solid", skip:Array<Int> = null)
+	{
+		if (!map.layers.exists(collideLayer))
+		{
+#if debug
+				trace("Layer '" + collideLayer + "' doesn't exist");
+#end
+			return;
+		}
 		
-// 		var gid:Int;
-// 		var layer:TmxLayer = map.layers.get(collideLayer);
-// 		var grid = new SlopedGrid(map.fullWidth, map.fullHeight, map.tileWidth, map.tileHeight);
-// 		var types = Type.getEnumConstructs(TileType);
+		var gid:Int;
+		var layer:TmxLayer = map.layers.get(collideLayer);
+		var grid = new SlopedGrid(map.fullWidth, map.fullHeight, map.tileWidth, map.tileHeight);
+		// var types = TileType.Empty;
 		
-// 		for (row in 0...layer.height)
-// 		{
-// 			for (col in 0...layer.width)
-// 			{
-// 				gid = layer.tileGIDs[row][col] - 1;
-// 				if (gid < 0) continue;
-// 				if (skip == null || Lambda.has(skip, gid) == false)
-// 				{
-// 					var type = map.getGidProperty(gid + 1, "tileType");
-// 					// collideType is null, load as solid tile
-// 					if (type == null)
-// 						grid.setTile(col, row, Solid);
-// 					// load as custom collide type tile
-// 					else
-// 					{
-// 						for(i in 0...types.length)
-// 						{
-// 							if(type == types[i])
-// 							{
-// 								grid.setTile(col, row,
-// 									Type.createEnum(TileType, type),
-// 									Std.parseFloat(map.getGidProperty(gid + 1, "slope")),
-// 									Std.parseFloat(map.getGidProperty(gid + 1, "yOffset"))
-// 									);
-// 								break;
-// 							}
-// 						}
-// 					}
-// 				}
-// 			}
-// 		}
+		for (row in 0...layer.height)
+		{
+			for (col in 0...layer.width)
+			{
+				gid = layer.tileGIDs[row][col] - 1;
+				if (gid < 0) continue;
+				if (skip == null || Lambda.has(skip, gid) == false)
+				{
+					var type = map.getGidProperty(gid + 1, "tileType");
+					// collideType is null, load as solid tile
+					if (type == null)
+						grid.setTile(col, row, Solid);
+					// load as custom collide type tile
+					else
+					{
+						var tileTypeID = switch(type)
+						{
+							case "Empty"		: TileType.Empty;
+							case "Solid"		: TileType.Solid;
+							case "AboveSlope"	: TileType.AboveSlope;
+							case "BelowSlope"	: TileType.BelowSlope;
+							case "TopLeft"		: TileType.TopLeft;
+							case "TopRight"		: TileType.TopRight;
+							case "BottomLeft"	: TileType.BottomLeft;
+							case "BottomRight"	: TileType.BottomRight;
+							default				: throw 'Cannot create sloped tile of type: $type';
+						}
+						grid.setTile(col, row, tileTypeID,
+							Std.parseFloat(map.getGidProperty(gid + 1, "slope")),
+							Std.parseFloat(map.getGidProperty(gid + 1, "yOffset"))
+						);
+					}
+				}
+			}
+		}
 		
-// 		this.mask = grid;
-// 		this.type = typeName;
-// 		setHitbox(grid.width, grid.height);
-// 	}
+		this.mask = grid;
+		this.type = typeName;
+		setHitbox(grid.width, grid.height);
+	}
 
 	/*
 		debugging shapes of object mask is only availble in -flash

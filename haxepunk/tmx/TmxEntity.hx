@@ -152,7 +152,18 @@ class TmxEntity extends Entity
 		return tileCoords;
 	}
 	
-	public function loadSlopedMask(collideLayer:String = "collide", typeName:String = "solid", skip:Array<Int> = null)
+	/**
+	 *  Loads a SlopedGrid from a tilelayer.
+	 *  
+	 *  The tiles in the tileset used must have a custom property named 'tileType'.
+	 *  The 'tileType' property must be a string that labels the tile as any of the
+	 *    haxepunk.masks.SlopedGrid.TileType values.
+	 *  
+	 *  @param collideLayer - The layer of the Tiled Map from which to create the Grid.
+	 *  @param typeName - The new type of this entity.
+	 *  @param skip - A list of tile gid's to skip.
+	 */
+	public function loadSlopedMask(collideLayer:String = "collide", typeName:String = "solid", ?skip:Array<Int> = null)
 	{
 		if (!map.layers.exists(collideLayer))
 		{

@@ -10,7 +10,7 @@ env:
     - HXCPP=3.4.49
   matrix:
     - EXAMPLES=no-backend
-    - EXAMPLES=nme NME=5.6.4
+    # - EXAMPLES=nme NME=5.6.4
     - EXAMPLES=openfl3 OPENFL=3.6.1 LIME=2.9.1
     - EXAMPLES=openfl4 OPENFL=4.6.0 LIME=3.6.2
     - EXAMPLES=openfl5 OPENFL=5.0.0 LIME=4.1.0
@@ -23,8 +23,14 @@ install:
   - if [[ $LIME ]]; then yes | haxelib install lime $LIME > log.txt || cat log.txt; fi
   - if [[ $OPENFL ]]; then yes | haxelib install openfl $OPENFL > log.txt || cat log.txt; fi
   - if [[ $NME ]]; then yes | haxelib install nme $NME > log.txt || cat log.txt; fi
-  - yes | haxelib git HaxePunk https://github.com/HaxePunk/HaxePunk.git
+  - git clone https://github.com/HaxePunk/HaxePunk.git --depth=1
+  - haxelib dev HaxePunk ./HaxePunk
+  - haxelib dev HaxePunkTmx $TRAVIS_BUILD_DIR
+  - haxelib install format
   - haxelib list
+
+before_script:
+  - chmod +x ./travis-build.sh
 
 script:
   - export HXCPP_COMPILE_CACHE=~/.hxcpp_cache

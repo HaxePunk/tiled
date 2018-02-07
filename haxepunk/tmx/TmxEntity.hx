@@ -9,7 +9,7 @@ import haxepunk.graphics.tile.Tilemap;
 import haxepunk.Mask;
 import haxepunk.masks.Grid;
 import haxepunk.masks.SlopedGrid;
-import haxepunk.masks.SlopedGrid.TileType;
+import haxepunk.masks.SlopedGrid.TileShape;
 import haxepunk.masks.Masklist;
 import haxepunk.tmx.TmxMap;
 
@@ -71,7 +71,7 @@ class TmxEntity extends Entity
 	}
 
 	/**
-	 *  Creates Tilemaps from with a supplied TileType and list of layer names.
+	 *  Creates Tilemaps from with a supplied TileShape and list of layer names.
 	 *  @param tileset - The tileset to use.
 	 *  @param layerNames - The names of the layers to create.
 	 *  @param skip - A list of tile gid's to skip.
@@ -157,7 +157,7 @@ class TmxEntity extends Entity
 	 *  
 	 *  The tiles in the tileset used must have a custom property named 'tileType'.
 	 *  The 'tileType' property must be a string that labels the tile as any of the
-	 *    haxepunk.masks.SlopedGrid.TileType values.
+	 *    haxepunk.masks.SlopedGrid.TileShape values.
 	 *  
 	 *  @param collideLayer - The layer of the Tiled Map from which to create the Grid.
 	 *  @param typeName - The new type of this entity.
@@ -176,7 +176,7 @@ class TmxEntity extends Entity
 		var gid:Int;
 		var layer:TmxLayer = map.layers.get(collideLayer);
 		var grid = new SlopedGrid(map.fullWidth, map.fullHeight, map.tileWidth, map.tileHeight);
-		// var types = TileType.Empty;
+		// var types = TileShape.Empty;
 		
 		for (row in 0...layer.height)
 		{
@@ -195,14 +195,14 @@ class TmxEntity extends Entity
 					{
 						var tileTypeID = switch(type)
 						{
-							case "Empty"		: TileType.Empty;
-							case "Solid"		: TileType.Solid;
-							case "AboveSlope"	: TileType.AboveSlope;
-							case "BelowSlope"	: TileType.BelowSlope;
-							case "TopLeft"		: TileType.TopLeft;
-							case "TopRight"		: TileType.TopRight;
-							case "BottomLeft"	: TileType.BottomLeft;
-							case "BottomRight"	: TileType.BottomRight;
+							case "Empty"		: TileShape.Empty;
+							case "Solid"		: TileShape.Solid;
+							case "AboveSlope"	: TileShape.AboveSlope;
+							case "BelowSlope"	: TileShape.BelowSlope;
+							case "TopLeft"		: TileShape.TopLeft;
+							case "TopRight"		: TileShape.TopRight;
+							case "BottomLeft"	: TileShape.BottomLeft;
+							case "BottomRight"	: TileShape.BottomRight;
 							default				: throw 'Cannot create sloped tile of type: $type';
 						}
 						grid.setTile(col, row, tileTypeID,

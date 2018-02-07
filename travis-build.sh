@@ -1,5 +1,9 @@
 #!/bin/bash
 
+set -e # exit the script automatically
+
+BUILD_DIR=${TRAVIS_BUILD_DIR:-$(pwd)}
+
 # Set command and targets
 if [[ $NME ]]; then
     COMMAND=nme
@@ -14,8 +18,7 @@ fi
 if [[ $COMMAND ]]; then
     for TARGET in $TARGETS; do
         echo "Building example with" $TARGET "using" $COMMAND
-        cd $TRAVIS_BUILD_DIR/example
+        cd $BUILD_DIR/example
         haxelib run $COMMAND build $TARGET || exit 1
-        done
     done
 fi

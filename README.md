@@ -1,4 +1,4 @@
-![Build Status](https://travis-ci.org/IkonOne/tiled.svg?branch=dev)
+[![Build Status](https://travis-ci.org/IkonOne/tiled.svg?branch=dev)](https://github.com/HaxePunk/tiled)
 
 # HaxePunk Tiled
 
